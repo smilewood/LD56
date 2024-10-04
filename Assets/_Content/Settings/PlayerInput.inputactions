@@ -1,0 +1,18 @@
+{
+    "name": "PlayerInput",
+    "maps": [
+        {
+            "name": "Gameplay",
+            "id": "8ae0d778-d340-48fe-92ff-e66dc8243b2f",
+            "actions": [],
+            "bindings": []
+        },
+        {
+            "name": "UI",
+            "id": "098eafba-3567-47e8-bb81-249f1d017dab",
+            "actions": [],
+            "bindings": []
+        }
+    ],
+    "controlSchemes": []
+}
