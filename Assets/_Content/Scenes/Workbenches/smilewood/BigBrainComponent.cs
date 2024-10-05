@@ -8,15 +8,15 @@ using UnityEngine;
 public struct DestinationDesireData : IBufferElementData
 {
    public float weight;
-   public float3 target;
+   public Entity target;
 }
 
 public struct CurrentDestinationData : IComponentData
 {
-   public float3 destination;
+   public float ApproachRadius;
+   public Entity destination;
+   public float3 destinationLocation;
 }
-
-
 
 public class BigBrainComponent : MonoBehaviour
 {
@@ -30,7 +30,5 @@ public class BigBrainBaker : Baker<BigBrainComponent>
       Entity target = GetEntity(TransformUsageFlags.None);
 
       AddBuffer<DestinationDesireData>(target);
-
-      AddComponent(target, new CurrentDestinationData { });
    }
 }

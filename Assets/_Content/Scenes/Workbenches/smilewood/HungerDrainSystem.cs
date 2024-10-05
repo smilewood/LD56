@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -21,6 +23,7 @@ public partial struct HungerDrainSystem : ISystem
       }.ScheduleParallel();
    }
 
+   [BurstCompile]
    public partial struct ProcessHungerDrainJob : IJobEntity
    {
       public EntityCommandBuffer.ParallelWriter ecb;
@@ -40,55 +43,60 @@ public partial struct HungerDrainSystem : ISystem
 
 public partial struct FoodFinderSystem : ISystem
 {
+   [BurstCompile]
    public void OnUpdate(ref SystemState state)
    {
+      EntityQuery FoodSourceQuery = SystemAPI.QueryBuilder().WithAll<FoodStationData, DestinationCapicityData>().Build();
+      NativeArray<Entity> foodStationLocations = FoodSourceQuery.ToEntityArray(state.WorldUnmanaged.UpdateAllocator.Handle);
+
       EntityCommandBuffer.ParallelWriter ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
 
-      ConcurrentBag<float3> foodStationLocations = new ConcurrentBag<float3>();
-      JobHandle findSourceJob = new FindFoodSourcesJob { sources = foodStationLocations }.ScheduleParallel(state.Dependency);
-
-      new ProcessFoodFinder { ecb = ecb, sources = foodStationLocations }.ScheduleParallel(findSourceJob);
+      new ProcessFoodFinder {
+         ecb = ecb,
+         sources = foodStationLocations,
+         locations = SystemAPI.GetComponentLookup<LocalToWorld>(),
+         capicatity = SystemAPI.GetComponentLookup<DestinationCapicityData>()
+      }.ScheduleParallel();
 
    }
 
-   public partial struct FindFoodSourcesJob : IJobEntity
-   {
-      public ConcurrentBag<float3> sources;
-
-      public void Execute(FoodStationData station, in LocalToWorld localToWorld)
-      {
-         if(station.CurrentOccupancy < station.MaxOccupency)
-         {
-           sources.Add(localToWorld.Position);
-         }
-      }
-   }
-
-
+   [BurstCompile]
    public partial struct ProcessFoodFinder: IJobEntity
    {
       public EntityCommandBuffer.ParallelWriter ecb;
-      public ConcurrentBag<float3> sources;
+      public NativeArray<Entity> sources;
+      [ReadOnly]
+      public ComponentLookup<LocalToWorld> locations;
+      [ReadOnly]
+      public ComponentLookup<DestinationCapicityData> capicatity;
 
-
-      private void Execute([ChunkIndexInQuery] int chunkIndex, in HaveHungerData hunger, ref DestinationDesireData dests,LocalToWorld transform, Entity ent)
+      private void Execute([ChunkIndexInQuery] int chunkIndex, in HaveHungerData hunger, in LocalToWorld transform, Entity ent)
       {
          float weight = -Mathf.Log(hunger.CurrentHunger / hunger.MaxHunger);
 
-         (float, float3) bestTarget = (math.INFINITY, float3.zero);
+         float bestTargetDist = math.INFINITY;
+         Entity bestTarget = default;
 
-         foreach(float3 target in sources)
+         foreach(Entity target in sources)
          {
-            float dist = math.abs(math.distance(transform.Position, target));
-            if(dist < bestTarget.Item1)
+            if (capicatity.TryGetComponent(target, out DestinationCapicityData seats) && seats.OpenSlots > 0)
             {
-               bestTarget = (dist, target);
+               if (locations.HasComponent(target))
+               {
+                  LocalToWorld targetPos = locations[target];
+
+                  float dist = math.abs(math.distance(transform.Position, targetPos.Position));
+                  if (dist < bestTargetDist)
+                  {
+                     bestTargetDist = dist;
+                     bestTarget = target;
+                  }
+               }
             }
          }
-
-         if(weight > dests.weight)
+         if(bestTargetDist != math.INFINITY)
          {
-            ecb.SetBuffer(chunkIndex, ent, new DestinationDesireData { weight = weight, target = bestTarget.Item2 });
+            ecb.AppendToBuffer(chunkIndex, ent, new DestinationDesireData { target = bestTarget, weight = weight });
          }
       }
    }

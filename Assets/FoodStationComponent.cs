@@ -4,18 +4,30 @@ using System.Reflection;
 using Unity.Entities;
 using UnityEngine;
 
-public class FoodStationData : IComponentData
+public struct FoodStationData : IComponentData
 {
    public float FeedingDistance;
-   public GameObject StationGO;
+   public float EatingTime;
+}
+
+public struct DestinationCapicityData : IComponentData
+{
    public float MaxOccupency;
    public float CurrentOccupancy;
+   public float OpenSlots
+   {
+      get
+      {
+         return MaxOccupency - CurrentOccupancy;
+      }
+   }
 }
 
 public class FoodStationComponent : MonoBehaviour
 {
    public float MaxFeeding;
    public float FeedingDistance;
+   public float EatingTime;
 }
 
 public class FoodStationBaker : Baker<FoodStationComponent>
@@ -24,12 +36,18 @@ public class FoodStationBaker : Baker<FoodStationComponent>
    {
       Entity target = GetEntity(TransformUsageFlags.Dynamic);
 
-      AddComponentObject(target, new FoodStationData
+      AddComponent(target, new FoodStationData
       {
          FeedingDistance = authoring.FeedingDistance,
-         MaxOccupency = authoring.MaxFeeding,
-         CurrentOccupancy = 0,
-         StationGO = authoring.gameObject
+         EatingTime = authoring.EatingTime
       });
+
+      AddComponent(target, new DestinationCapicityData
+      {
+         MaxOccupency = authoring.MaxFeeding,
+         CurrentOccupancy = 0
+      });
+      
+      AddComponentObject(target, authoring.gameObject.GetComponent<FoodStationActions>());
    }
 }

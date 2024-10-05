@@ -1,56 +1,55 @@
-using Unity.Entities;
-using Unity.Mathematics;
-using Unity.Transforms;
-using UnityEngine;
+//using System;
+//using NUnit;
+//using Unity.Collections;
+//using Unity.Collections.LowLevel.Unsafe;
+//using Unity.Entities;
+//using Unity.Jobs.LowLevel.Unsafe;
+//using Unity.Mathematics;
+//using Unity.Transforms;
+//using UnityEngine;
 
-public partial struct TempWanderSystem : ISystem
-{
-   Unity.Mathematics.Random testRandom;
+//public partial struct TempWanderSystem : ISystem
+//{
+//   Unity.Mathematics.Random testRandom;
+//   [NativeDisableContainerSafetyRestriction]
+//   public NativeArray<Unity.Mathematics.Random> Randoms;
 
-   private void OnUpdate(ref SystemState state)
-   {
-      
-      EntityCommandBuffer.ParallelWriter ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
+//   private void OnCreate(ref SystemState state)
+//   {
+//      Randoms = new NativeArray<Unity.Mathematics.Random>(JobsUtility.MaxJobThreadCount, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+//      uint r = (uint)UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+//      for (int i = 0; i < JobsUtility.MaxJobThreadCount; i++)
+//      {
+//         Randoms[i] = new Unity.Mathematics.Random(r == 0 ? r + 1 : r);
+//      }
+//   }
 
-      new ProcessWanderJob
-      {
-         deltaTime = SystemAPI.Time.DeltaTime,
-         Ecb = ecb
-      }.ScheduleParallel();
-   }
+//   private void OnUpdate(ref SystemState state)
+//   {
 
-   public partial struct ProcessWanderJob : IJobEntity
-   {
-      public EntityCommandBuffer.ParallelWriter Ecb;
-      public float deltaTime;
+//      EntityCommandBuffer.ParallelWriter ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
 
-      private void Execute([ChunkIndexInQuery] int chunkIndex, ref MoveSpeedData moveSpeed, ref LocalTransform transform, Entity target)
-      {
-         //if(guy.Destination == null)
-         //{
-         //   //Pick a location
+//      new ProcessWanderJob
+//      {
+//         Ecb = ecb
+//      }.ScheduleParallel();
+//   }
 
-         //   Ecb.SetComponent(chunkIndex, target, new MovableData
-         //   { 
-         //      Destination = new float3(7, 0f, 7), 
-         //      speed = guy.speed
-         //   });
-         //   return;
-         //}
-           
-         //if(math.distance(guy.Destination.Value, transform.Position) < .1f)
-         //{
-         //   //Destination reached!
-         //   Ecb.SetComponent(chunkIndex, target, new MovableData
-         //   {
-         //      Destination = guy.Destination * -1,
-         //      speed = guy.speed
-         //   });
-         //   return;
-         //}
+//   public partial struct ProcessWanderJob : IJobEntity
+//   {
+//      [NativeDisableContainerSafetyRestriction]
+//      public NativeArray<Unity.Mathematics.Random> Randoms;
+//      [NativeSetThreadIndex] private int _threadId;
 
-         float3 newPos = math.lerp(transform.Position, guy.Destination.Value, guy.speed * deltaTime);
-         Ecb.SetComponent(chunkIndex, target, LocalTransform.FromPosition(newPos));
-      }
-   }
-}
+//      public EntityCommandBuffer.ParallelWriter ecb;
+
+//      private void Execute([ChunkIndexInQuery] int chunkIndex, in MovableData _, Entity target)
+//      {
+//         Unity.Mathematics.Random random = Randoms[_threadId];
+//         float3 location = new float3((random.NextFloat() * 8) - 4, 0f, (random.NextFloat() * 8) - 4);
+
+//         ecb.AppendToBuffer(chunkIndex, target, new DestinationDesireData { target = location, weight = .5f });
+//         Randoms[_threadId] = random;
+//      }
+//   }
+//}
