@@ -4,6 +4,7 @@ using vegeo;
 
 public class CameraController : MonoBehaviour
 {
+    public bool AllowMouseInput;
     [SerializeField] private InputActionAsset _input;
 
     [Header("Config")]
@@ -13,6 +14,7 @@ public class CameraController : MonoBehaviour
     public AnimationCurve ZoomSensitivityCurve;
     public float MaxMoveSpeed = 10f;
     public float MinMoveSpeed = 2f;
+    public float ScrollZoomAmount = 0.05f;
     public float MouseZoomSpeed = -0.005f;
     public float MouseRotationSpeed = 0.1f;
     public float KeyboardRotationSpeed = 100f;
@@ -61,7 +63,9 @@ public class CameraController : MonoBehaviour
             Cursor.visible = true;
         }
 
-        _zoomValue = Mathf.Clamp01(_zoomValue + (Mouse.current.rightButton.isPressed ? Mouse.current.delta.y.ReadValue() * MouseZoomSpeed : 0));
+        if (Mouse.current.scroll.y.ReadValue() != 0 && AllowMouseInput)
+            _zoomValue = Mathf.Clamp01(_zoomValue + Mathf.Sign(Mouse.current.scroll.y.ReadValue()) * ScrollZoomAmount);
+
         //float moveSpeed = Mathf.Lerp(MinMoveSpeed, MaxMoveSpeed, _zoomValue);
         float moveSpeed = Util.map(ZoomSensitivityCurve.Evaluate(_zoomValue), 0f, 1f, MinMoveSpeed, MaxMoveSpeed);
         Vector3 moveDirection = _moveAction.ReadValue<Vector2>().ToXZ();
@@ -88,7 +92,7 @@ public class CameraController : MonoBehaviour
         moveDirection.z = 0;
         _camera.transform.position += _focusTransform.TransformDirection(moveDirection);
 
-        if (Mouse.current.rightButton.isPressed)
+        if (Mouse.current.rightButton.isPressed && AllowMouseInput)
         {
             _focusTransform.eulerAngles += new Vector3(0, Mouse.current.delta.x.ReadValue() * MouseRotationSpeed, 0);
         }

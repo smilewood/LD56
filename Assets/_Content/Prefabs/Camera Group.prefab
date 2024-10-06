@@ -266,6 +266,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc4fd13030758224f985dffef68e213f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AllowMouseInput: 0
   _input: {fileID: -944628639613478452, guid: 6fc39e4dfb70d3f4ea853b90a5cad796, type: 3}
   _lerpingSpeed: 5
   ZoomSensitivityCurve:
@@ -294,6 +295,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   MaxMoveSpeed: 30
   MinMoveSpeed: 8
+  ScrollZoomAmount: -0.05
   MouseZoomSpeed: -0.005
   MouseRotationSpeed: 0.1
   KeyboardRotationSpeed: 100

@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private InputActionAsset _inputActions;
     [SerializeField] private Transform _buildUI;
     [SerializeField] private GameObject _testPrefab;
+    [SerializeField] private CameraController _cameraController;
     [Header("Building Mode")]
     [SerializeField] private Transform _buildModeGroup;
     [SerializeField] private Transform _previewParent;
@@ -17,6 +18,8 @@ public class PlayerController : MonoBehaviour
     private InputAction _rotateBuildingAction;
     private GameObject _currentBuilding;
 
+    private BuildingPreview _buildingPreview;
+
     private float _timeStartedBuilding;
 
     public PlayerState State { get; private set; }
@@ -25,6 +28,7 @@ public class PlayerController : MonoBehaviour
     {
         _rotateBuildingAction = _inputActions.FindAction("RotateBuilding");
         _rotateBuildingAction.Enable();
+        _buildingPreview = _previewParent.GetComponent<BuildingPreview>();
     }
 
     private void Update()
@@ -42,6 +46,8 @@ public class PlayerController : MonoBehaviour
 
     private void HandleNoneState()
     {
+        _cameraController.AllowMouseInput = true;
+
         if (!EventSystem.current.IsPointerOverGameObject())
         {
             if (_buildUI.gameObject.activeSelf)
@@ -65,6 +71,8 @@ public class PlayerController : MonoBehaviour
 
     private void HandlePlacingState()
     {
+        _cameraController.AllowMouseInput = false;
+
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
         Physics.Raycast(ray, out hit, Mathf.Infinity, _buildingRaycastMask);
@@ -79,9 +87,16 @@ public class PlayerController : MonoBehaviour
             _buildModeGroup.Rotate(Vector3.up, _buildingRotateAmount * Mathf.Sign(_rotateBuildingAction.ReadValue<float>()));
         }
 
+        _previewMaterial.SetFloat("_Valid", _buildingPreview.ValidPlacement ? 1 : 0);
+
         if (Mouse.current.leftButton.wasPressedThisFrame && Time.time - _timeStartedBuilding > 1f)
         {
             PlaceBuilding();
+        }
+
+        if (Mouse.current.rightButton.wasPressedThisFrame)
+        {
+            CancelBuilding();
         }
     }
 
@@ -108,6 +123,12 @@ public class PlayerController : MonoBehaviour
             newMeshRenderer.materials = newMaterials;
         }
 
+        Collider collider = _currentBuilding.transform.Find("Bounds")?.GetComponent<Collider>();
+        if (collider)
+        {
+            Instantiate(collider.gameObject, _previewParent, true);
+        }
+
         _buildModeGroup.gameObject.SetActive(true);
         _timeStartedBuilding = Time.time;
     }
@@ -115,12 +136,32 @@ public class PlayerController : MonoBehaviour
     private void PlaceBuilding()
     {
         if (State != PlayerState.Placing) return;
+        if (!_buildingPreview.ValidPlacement) return;
+
         State = PlayerState.None;
 
         _currentBuilding.transform.SetParent(null);
         _currentBuilding.SetActive(true);
 
         _buildModeGroup.gameObject.SetActive(false);
+
+        EmptyPreview();
+    }
+
+    private void CancelBuilding()
+    {
+        if (State != PlayerState.Placing) return;
+        State = PlayerState.None;
+
+        Destroy(_currentBuilding);
+
+        _buildModeGroup.gameObject.SetActive(false);
+
+        EmptyPreview();
+    }
+
+    private void EmptyPreview()
+    {
 
         foreach (Transform preview in _previewParent)
         {
