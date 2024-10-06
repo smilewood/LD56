@@ -3,7 +3,27 @@ guid: c0782faeb9075ef408661aa9aa569730
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Apple
+    second: {fileID: 2100000, guid: 5629345d766b09d4c87af8e3f52385da, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Fence
+    second: {fileID: 2100000, guid: 83a94fed38388d14ba8e4f28a18d0c21, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Leaves
+    second: {fileID: 2100000, guid: 68a2767f7c7fe2b4c9d64c6db77b76fa, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Trunk
+    second: {fileID: 2100000, guid: adba241046b744d4b80fbf130d7062df, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
