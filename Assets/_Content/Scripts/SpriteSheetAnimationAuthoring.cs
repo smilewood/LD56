@@ -13,6 +13,7 @@ public class SpriteSheetAnimationAuthoring : MonoBehaviour
     public int creatureIndex;
     public int animationIndex;
     public int animationCount;
+    public int creatureCount;
     public int frameCount;
     public float fps;
 
@@ -28,6 +29,7 @@ public class SpriteSheetAnimationAuthoring : MonoBehaviour
                 fps = authoring.fps,
                 animationIndex = authoring.animationIndex,
                 animationCount = authoring.animationCount,
+                creatureCount = authoring.creatureCount,
                 creatureIndex = authoring.creatureIndex
             });
         }
@@ -44,6 +46,7 @@ public struct SpriteSheetAnimation : IComponentData
     public float animationTime;
     public int frameCount;
     public int animationCount;
+    public int creatureCount;
     public float fps;
 
     public Vector4 uv;
@@ -78,9 +81,9 @@ public partial struct SpriteSheetAnimationSystem : ISystem
             spriteSheetAnimation.animationTime %= spriteSheetAnimation.frameCount;
 
             float uvWidth = 1f / spriteSheetAnimation.frameCount;
-            float uvHeight = 1f / spriteSheetAnimation.animationCount;
+            float uvHeight = 1f / (spriteSheetAnimation.animationCount * spriteSheetAnimation.creatureCount);
             float uvOffsetX = uvWidth * (int)spriteSheetAnimation.animationTime;
-            float uvOffsetY = (spriteSheetAnimation.creatureIndex + 1) * uvHeight * spriteSheetAnimation.animationIndex;
+            float uvOffsetY = uvHeight * spriteSheetAnimation.animationIndex + (uvHeight * spriteSheetAnimation.animationCount * spriteSheetAnimation.creatureIndex);
             spriteSheetAnimation.uv = new Vector4(uvWidth, uvHeight, uvOffsetX, uvOffsetY);
 
             spriteSheetAnimation.matrix = Matrix4x4.TRS(localToWorld.Position + new float3(0, 0.5f,0), Quaternion.identity, Vector3.one);
