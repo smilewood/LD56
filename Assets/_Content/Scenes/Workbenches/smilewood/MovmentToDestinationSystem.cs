@@ -19,7 +19,9 @@ public partial struct MovmentToDestinationSystem : ISystem
          deltaTime = SystemAPI.Time.DeltaTime,
          Ecb = ecb,
          foodStations = SystemAPI.GetComponentLookup<FoodStationData>(),
-         capicity = SystemAPI.GetComponentLookup<DestinationCapicityData>()
+         drinkStations = SystemAPI.GetComponentLookup<DrinkStationData>(),
+         capicity = SystemAPI.GetComponentLookup<DestinationCapicityData>(),
+         workStations = SystemAPI.GetComponentLookup<WorkStationData>()
       }.ScheduleParallel();
    }
 
@@ -30,6 +32,10 @@ public partial struct MovmentToDestinationSystem : ISystem
       public float deltaTime;
       [ReadOnly]
       public ComponentLookup<FoodStationData> foodStations;
+      [ReadOnly]
+      public ComponentLookup<DrinkStationData> drinkStations;
+      [ReadOnly]
+      public ComponentLookup<WorkStationData> workStations;
       [ReadOnly]
       public ComponentLookup<DestinationCapicityData> capicity;
 
@@ -42,15 +48,39 @@ public partial struct MovmentToDestinationSystem : ISystem
          DestinationCapicityData destCapicity = capicity[destination.destination];
          if (math.distance(world.Position, destination.destinationLocation) < destination.ApproachRadius)
          {
-            Debug.Log($"Arrived at destination!");
-
             Ecb.RemoveComponent<CurrentDestinationData>(chunkIndex, target);
-            Ecb.AddComponent(chunkIndex, target, new ActivityData
+            if (foodStations.TryGetComponent(destination.destination, out FoodStationData foodStation))
             {
-               remainingTime = foodStations[destination.destination].EatingTime,
-               reservedSpot = destCapicity,
-               reservedSpotEntity = destination.destination
-            });
+               Ecb.AddComponent(chunkIndex, target, new ActivityData
+               {
+                  remainingTime = foodStation.EatingTime,
+                  reservedSpot = destCapicity,
+                  Activity = ActivityType.Eat
+               });
+            }
+            else if (drinkStations.TryGetComponent(destination.destination, out DrinkStationData drinkStation))
+            {
+               Ecb.AddComponent(chunkIndex, target, new ActivityData
+               {
+                  remainingTime = drinkStation.DrinkTime,
+                  reservedSpot = destCapicity,
+                  Activity = ActivityType.Drink
+               });
+            }
+            else if (workStations.TryGetComponent(destination.destination, out WorkStationData workStation))
+            {
+               Ecb.AddComponent(chunkIndex, target, new ActivityData
+               {
+                  remainingTime = workStation.DrinkTime,
+                  reservedSpot = destCapicity,
+                  Activity = ActivityType.Produce,
+                  ActivityTarget = workStation.WorkResultPrefab
+               });
+            }
+            else
+            {
+               Debug.LogError("We got somewhere without a work type");
+            }
 
             Ecb.SetComponent(chunkIndex, destination.destination, new DestinationCapicityData
             {
@@ -60,7 +90,6 @@ public partial struct MovmentToDestinationSystem : ISystem
          }
          else if(destCapicity.OpenSlots <= 0)
          {
-            Debug.Log("Destination Filled Up");
             //Someone took my spot, just give up
             Ecb.RemoveComponent<CurrentDestinationData>(chunkIndex, target);
          }

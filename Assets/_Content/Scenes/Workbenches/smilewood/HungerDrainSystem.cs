@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Unity.Burst;
 using Unity.Collections;
@@ -10,36 +11,37 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
-public partial struct HungerDrainSystem : ISystem
-{
-   public void OnUpdate(ref SystemState state)
-   {
-      EntityCommandBuffer.ParallelWriter ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
 
-      new ProcessHungerDrainJob
-      {
-         deltaTime = SystemAPI.Time.DeltaTime,
-         ecb = ecb
-      }.ScheduleParallel();
-   }
+//public partial struct HungerDrainSystem : ISystem
+//{
+//   public void OnUpdate(ref SystemState state)
+//   {
+//      EntityCommandBuffer.ParallelWriter ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
 
-   [BurstCompile]
-   public partial struct ProcessHungerDrainJob : IJobEntity
-   {
-      public EntityCommandBuffer.ParallelWriter ecb;
-      public float deltaTime;
-      private void Execute([ChunkIndexInQuery] int chunkIndex, ref HaveHungerData hunger, Entity target)
-      {
-         ecb.SetComponent(chunkIndex, target, new HaveHungerData
-         {
-            CurrentHunger = hunger.CurrentHunger - (hunger.DrainPerSec * hunger.HungerDrainMult * deltaTime),
-            HungerDrainMult = hunger.HungerDrainMult,
-            MaxHunger = hunger.MaxHunger,
-            DrainPerSec = hunger.DrainPerSec
-         });
-      }
-   }
-}
+//      new ProcessHungerDrainJob
+//      {
+//         deltaTime = SystemAPI.Time.DeltaTime,
+//         ecb = ecb
+//      }.ScheduleParallel();
+//   }
+
+//   [BurstCompile]
+//   public partial struct ProcessHungerDrainJob : IJobEntity
+//   {
+//      public EntityCommandBuffer.ParallelWriter ecb;
+//      public float deltaTime;
+//      private void Execute([ChunkIndexInQuery] int chunkIndex, ref HaveHungerData hunger, Entity target)
+//      {
+//         ecb.SetComponent(chunkIndex, target, new HaveHungerData
+//         {
+//            CurrentHunger = hunger.CurrentHunger - (hunger.DrainPerSec * hunger.HungerDrainMult * deltaTime),
+//            HungerDrainMult = hunger.HungerDrainMult,
+//            MaxHunger = hunger.MaxHunger,
+//            DrainPerSec = hunger.DrainPerSec
+//         });
+//      }
+//   }
+//}
 
 public partial struct FoodFinderSystem : ISystem
 {
@@ -70,12 +72,23 @@ public partial struct FoodFinderSystem : ISystem
       [ReadOnly]
       public ComponentLookup<DestinationCapicityData> capicatity;
 
-      private void Execute([ChunkIndexInQuery] int chunkIndex, in HaveHungerData hunger, in LocalToWorld transform, Entity ent)
+      private void Execute([ChunkIndexInQuery] int chunkIndex, in DynamicBuffer<ModifierData> modifiers, in LocalToWorld transform, Entity ent)
       {
-         float weight = -Mathf.Log(hunger.CurrentHunger / hunger.MaxHunger);
+         ModifierData hunger = default;
+         for (int i = 0; i < modifiers.Length; ++i)
+         {
+            if (modifiers[i].ModType == ModifierType.Hunger)
+            {
+               hunger = modifiers[i];
+               break;
+            }
+         }
+
+         float weight = -Mathf.Log(hunger.CurrentValue / hunger.MaxValue);
 
          float bestTargetDist = math.INFINITY;
          Entity bestTarget = default;
+
 
          foreach(Entity target in sources)
          {

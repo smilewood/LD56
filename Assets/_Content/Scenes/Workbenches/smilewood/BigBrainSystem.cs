@@ -47,11 +47,12 @@ public partial struct BigBrainSystem : ISystem
 
       public void Execute([ChunkIndexInQuery] int chunkIndex, Entity target)
       {
-         float maxWeight = -math.INFINITY;
-         Entity maxTarget = default;
-
          if (desireBuffer.HasBuffer(target))
          {
+
+            float maxWeight = -math.INFINITY;
+            Entity maxTarget = default;
+
             foreach (DestinationDesireData d in desireBuffer[target])
             {
                if (d.weight > maxWeight)
@@ -60,12 +61,12 @@ public partial struct BigBrainSystem : ISystem
                   maxWeight = d.weight;
                }
             }
+            //TODO: I think there is data somewhere to adjust the approach distance
             float approach = 1;
 
 
             if (maxWeight != -math.INFINITY)
             {
-               Debug.Log($"Picking new destination {locations[maxTarget].Position}");
                Ecb.AddComponent(chunkIndex, target, new CurrentDestinationData
                {
                   destination = maxTarget,
@@ -73,6 +74,7 @@ public partial struct BigBrainSystem : ISystem
                   ApproachRadius = approach
                });
             }
+            Ecb.SetBuffer<DestinationDesireData>(chunkIndex, target);
          }
       }
 
