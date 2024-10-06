@@ -28,8 +28,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1102451000656284021}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.51989293, y: -0, z: -0, w: 0.8542315}
-  m_LocalPosition: {x: 0, y: 15, z: -7.5}
+  m_LocalRotation: {x: 0.52358145, y: -0, z: -0, w: 0.8519757}
+  m_LocalPosition: {x: 0, y: 40, z: -20}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -183,7 +183,7 @@ Transform:
   m_GameObject: {fileID: 1329604826898082462}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 25, z: -15}
+  m_LocalPosition: {x: 0, y: 40, z: -20}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -214,7 +214,7 @@ Transform:
   m_GameObject: {fileID: 3897018690528810231}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: -10}
+  m_LocalPosition: {x: 0, y: 0.5, z: -15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -266,11 +266,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc4fd13030758224f985dffef68e213f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _input: {fileID: -944628639613478452, guid: 6fc39e4dfb70d3f4ea853b90a5cad796, type: 3}
   _lerpingSpeed: 5
-  MaxMoveSpeed: 10
-  MinMoveSpeed: 2
-  ZoomSpeed: -0.001
-  RotationSpeed: 0.2
+  ZoomSensitivityCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  MaxMoveSpeed: 30
+  MinMoveSpeed: 8
+  MouseZoomSpeed: -0.005
+  MouseRotationSpeed: 0.1
+  KeyboardRotationSpeed: 100
   PanBorderThickness: 10
   _focusTransform: {fileID: 5692911516020903931}
   _highPosition: {fileID: 4635340514312624685}

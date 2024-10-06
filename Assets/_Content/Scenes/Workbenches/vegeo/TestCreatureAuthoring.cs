@@ -39,7 +39,8 @@ public partial struct TestCreatureSystem : ISystem
     {
         state.RequireForUpdate<TestCreature>();
 
-        _randoms = new NativeArray<Unity.Mathematics.Random>(JobsUtility.MaxJobThreadCount, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+        if (!_randoms.IsCreated)
+            _randoms = new NativeArray<Unity.Mathematics.Random>(JobsUtility.MaxJobThreadCount, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
         uint r = (uint)UnityEngine.Random.Range(int.MinValue, int.MaxValue);
         for (int i = 0; i < JobsUtility.MaxJobThreadCount; i++)
         {
