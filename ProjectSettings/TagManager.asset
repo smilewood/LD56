@@ -15,9 +15,9 @@ TagManager:
   - Post Processing
   - Ground
   - StructureBounds
-  - 
-  - 
-  - 
+  - MapObjects
+  - Clipping
+  - PlayerFocus
   - 
   - 
   - 
