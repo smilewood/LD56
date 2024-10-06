@@ -5,8 +5,8 @@ using UnityEngine;
 
 public struct WorkStationData : IComponentData
 {
-   public float DrinkDistance;
-   public float DrinkTime;
+   public float WorkDistance;
+   public float WorkTime;
    public Entity WorkResultPrefab;
 }
 
@@ -27,15 +27,16 @@ public class WorkStationBaker : Baker<WorkStationComponent>
 
       AddComponent(target, new WorkStationData
       {
-         DrinkDistance = authoring.WorkDistance,
-         DrinkTime = authoring.WorkTime,
+         WorkDistance = authoring.WorkDistance,
+         WorkTime = authoring.WorkTime,
          WorkResultPrefab = GetEntity(authoring.WorkResultPrefab, TransformUsageFlags.None)
       });
 
       AddComponent(target, new DestinationCapicityData
       {
          MaxOccupency = authoring.MaxWorking,
-         CurrentOccupancy = 0
+         CurrentOccupancy = 0,
+         destEntity = target
       });
 
       //AddComponentObject(target, authoring.gameObject.GetComponent<FoodStationActions>());

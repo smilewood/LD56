@@ -39,7 +39,6 @@ public partial struct ActivitySystem : ISystem
 
       private void HandleActivityEnd(int chunkIndex, ref ActivityData activity)
       {
-         activity.reservedSpot.CurrentOccupancy--;
          switch (activity.Activity)
          {
             case ActivityType.Produce:

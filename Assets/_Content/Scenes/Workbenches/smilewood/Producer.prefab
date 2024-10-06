@@ -155,7 +155,7 @@ MonoBehaviour:
     naturalDecayRate: 0.1
   - ModType: 2
     startValue: 5
-    naturalDecayRate: 0.03
+    naturalDecayRate: -0.03
 --- !u!114 &5237903761240476924
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -71,7 +71,7 @@ public partial struct MovmentToDestinationSystem : ISystem
             {
                Ecb.AddComponent(chunkIndex, target, new ActivityData
                {
-                  remainingTime = workStation.DrinkTime,
+                  remainingTime = workStation.WorkTime,
                   reservedSpot = destCapicity,
                   Activity = ActivityType.Produce,
                   ActivityTarget = workStation.WorkResultPrefab
@@ -81,12 +81,6 @@ public partial struct MovmentToDestinationSystem : ISystem
             {
                Debug.LogError("We got somewhere without a work type");
             }
-
-            Ecb.SetComponent(chunkIndex, destination.destination, new DestinationCapicityData
-            {
-               CurrentOccupancy = destCapicity.CurrentOccupancy + 1,
-               MaxOccupency = destCapicity.MaxOccupency
-            });
          }
          else if(destCapicity.OpenSlots <= 0)
          {

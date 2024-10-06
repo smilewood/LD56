@@ -23,7 +23,7 @@ public class DrinkStationBaker : Baker<DrinkStationComponent>
    {
       Entity target = GetEntity(TransformUsageFlags.Dynamic);
 
-      AddComponent(target, new WorkStationData
+      AddComponent(target, new DrinkStationData
       {
          DrinkDistance = authoring.DrinkDistance,
          DrinkTime = authoring.drinkTime,
@@ -32,7 +32,8 @@ public class DrinkStationBaker : Baker<DrinkStationComponent>
       AddComponent(target, new DestinationCapicityData
       {
          MaxOccupency = authoring.MaxDrinking,
-         CurrentOccupancy = 0
+         CurrentOccupancy = 0,
+         destEntity = target
       });
 
       //AddComponentObject(target, authoring.gameObject.GetComponent<FoodStationActions>());

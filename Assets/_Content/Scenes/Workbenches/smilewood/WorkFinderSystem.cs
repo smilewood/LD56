@@ -36,7 +36,7 @@ public partial struct WorkFinderSystem : ISystem
       [ReadOnly]
       public ComponentLookup<DestinationCapicityData> capicatity;
 
-      private void Execute([ChunkIndexInQuery] int chunkIndex, in WorkerTypeData workerType, in LocalToWorld transform, Entity ent)
+      private void Execute(ref DestinationDesireData desires, in WorkerTypeData workerType, in LocalToWorld transform)
       {
          float bestTargetDist = math.INFINITY;
          Entity bestTarget = default;
@@ -60,7 +60,12 @@ public partial struct WorkFinderSystem : ISystem
          }
          if (bestTargetDist != math.INFINITY)
          {
-            ecb.AppendToBuffer(chunkIndex, ent, new DestinationDesireData { target = bestTarget, weight = .5f });
+            desires.workWeight = .5f;
+            desires.workTarget = bestTarget;
+         }
+         else
+         {
+            desires.workWeight = -1;
          }
       }
    }

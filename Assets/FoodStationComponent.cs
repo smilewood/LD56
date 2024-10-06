@@ -14,6 +14,7 @@ public struct DestinationCapicityData : IComponentData
 {
    public float MaxOccupency;
    public float CurrentOccupancy;
+   public Entity destEntity;
    public float OpenSlots
    {
       get
@@ -45,7 +46,8 @@ public class FoodStationBaker : Baker<FoodStationComponent>
       AddComponent(target, new DestinationCapicityData
       {
          MaxOccupency = authoring.MaxFeeding,
-         CurrentOccupancy = 0
+         CurrentOccupancy = 0,
+         destEntity = target
       });
       
       AddComponentObject(target, authoring.gameObject.GetComponent<FoodStationActions>());

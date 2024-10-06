@@ -5,10 +5,17 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
-public struct DestinationDesireData : IBufferElementData
+public struct DestinationDesireData : IComponentData
 {
-   public float weight;
-   public Entity target;
+   public float foodWeight;
+   public Entity foodTarget;
+
+   public float  waterWeight;
+   public Entity waterTarget;
+
+   public float  workWeight;
+   public Entity workTarget;
+
 }
 
 public struct CurrentDestinationData : IComponentData
@@ -28,7 +35,7 @@ public class BigBrainBaker : Baker<BigBrainComponent>
    public override void Bake(BigBrainComponent authoring)
    {
       Entity target = GetEntity(TransformUsageFlags.None);
-
-      AddBuffer<DestinationDesireData>(target);
+      
+      AddComponent(target, new DestinationDesireData { });
    }
 }

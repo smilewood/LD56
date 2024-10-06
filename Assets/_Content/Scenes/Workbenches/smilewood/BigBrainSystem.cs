@@ -12,69 +12,67 @@ using UnityEngine;
 [UpdateInGroup(typeof(LateSimulationSystemGroup))]
 public partial struct BigBrainSystem : ISystem
 {
-   private BufferLookup<DestinationDesireData> desireBuffer;
 
-   public void OnCreate(ref SystemState state)
-   {
-      desireBuffer = state.GetBufferLookup<DestinationDesireData>(false);
-   }
 
    [BurstCompile]
    public void OnUpdate(ref SystemState state)
    {
       EntityCommandBuffer.ParallelWriter ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
       EntityQuery needDestQuery = SystemAPI.QueryBuilder()
+         .WithAll<DestinationDesireData>()
          .WithAbsent<ActivityData, CurrentDestinationData>().Build();
-      desireBuffer.Update(ref state);
       new DestinationChoiceJob
       {
-         desireBuffer = desireBuffer,
          Ecb = ecb,
          locations = SystemAPI.GetComponentLookup<LocalToWorld>()
       }.ScheduleParallel(needDestQuery);
+
    }
 
    [BurstCompile]
    public partial struct DestinationChoiceJob : IJobEntity
    {
-      [ReadOnly]
-      public BufferLookup<DestinationDesireData> desireBuffer;
-
       public EntityCommandBuffer.ParallelWriter Ecb;
       [ReadOnly]
       public ComponentLookup<LocalToWorld> locations;
 
 
-      public void Execute([ChunkIndexInQuery] int chunkIndex, Entity target)
+      public void Execute([ChunkIndexInQuery] int chunkIndex, in DestinationDesireData desire, Entity target)
       {
-         if (desireBuffer.HasBuffer(target))
+         float maxWeight = -math.INFINITY;
+         Entity maxTarget = default;
+
+
+         if (desire.foodWeight > maxWeight)
          {
+            maxTarget = desire.foodTarget;
+            maxWeight = desire.foodWeight;
+         }
+         if (desire.waterWeight > maxWeight)
+         {
+            maxTarget = desire.waterTarget;
+            maxWeight = desire.waterWeight;
+         }
+         if (desire.workWeight > maxWeight)
+         {
+            maxTarget = desire.workTarget;
+            maxWeight = desire.workWeight;
+         }
 
-            float maxWeight = -math.INFINITY;
-            Entity maxTarget = default;
 
-            foreach (DestinationDesireData d in desireBuffer[target])
+
+         //TODO: I think there is data somewhere to adjust the approach distance
+         float approach = 1;
+
+
+         if (maxWeight != -math.INFINITY)
+         {
+            Ecb.AddComponent(chunkIndex, target, new CurrentDestinationData
             {
-               if (d.weight > maxWeight)
-               {
-                  maxTarget = d.target;
-                  maxWeight = d.weight;
-               }
-            }
-            //TODO: I think there is data somewhere to adjust the approach distance
-            float approach = 1;
-
-
-            if (maxWeight != -math.INFINITY)
-            {
-               Ecb.AddComponent(chunkIndex, target, new CurrentDestinationData
-               {
-                  destination = maxTarget,
-                  destinationLocation = locations[maxTarget].Position,
-                  ApproachRadius = approach
-               });
-            }
-            Ecb.SetBuffer<DestinationDesireData>(chunkIndex, target);
+               destination = maxTarget,
+               destinationLocation = locations[maxTarget].Position,
+               ApproachRadius = approach
+            });
          }
       }
 

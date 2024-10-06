@@ -10,24 +10,15 @@ using UnityEngine;
 
 public partial struct ModifierDrainSystem : ISystem
 {
-   private BufferLookup<ModifierData> modifierBuffer;
-
-   public void OnCreate(ref SystemState state)
-   {
-      modifierBuffer = state.GetBufferLookup<ModifierData>(false);
-   }
 
    [BurstCompile]
-   public void Update(ref SystemState state)
+   public void OnUpdate(ref SystemState state)
    {
-      Debug.Log("Here");
       EntityCommandBuffer.ParallelWriter ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
-      modifierBuffer.Update(ref state);
       new DrainModifierJob
       {
          DeltaTime = SystemAPI.Time.DeltaTime,
          ecb = ecb,
-         modifierBuffer = modifierBuffer
       }.ScheduleParallel();
    }
 
@@ -36,26 +27,28 @@ public partial struct ModifierDrainSystem : ISystem
    {
       public float DeltaTime;
       public EntityCommandBuffer.ParallelWriter ecb;
-      [ReadOnly]
-      public BufferLookup<ModifierData> modifierBuffer;
 
-      public void Execute([ChunkIndexInQuery] int chunkIndex, in CanHaveModifiers _, Entity target)
+      public void Execute([ChunkIndexInQuery] int chunkIndex, ref DynamicBuffer<ModifierData> initialBuffer, Entity target)
       {
-         DynamicBuffer<ModifierData> modBuffer = modifierBuffer[target];
-         Debug.Log($"there are {modBuffer.Length} things in the buffer");
-         for (int i = 0; i < modBuffer.Length; ++i)
+         DynamicBuffer<ModifierData> modBuffer = ecb.SetBuffer<ModifierData>(chunkIndex, target);
+
+         for (int i = 0; i < initialBuffer.Length; ++i)
          {
-            var modifier = modBuffer[i];
+            var modifier = initialBuffer[i];
             if(modifier.CurrentValue <= 0)
             {
-               HandleModifierDrained(chunkIndex, ref modifier, ref modBuffer, target);
+               HandleModifierDrained(chunkIndex, ref modifier, ref initialBuffer, target);
             }
             else
             {
-               modifier.CurrentValue = math.min(modifier.CurrentValue + (modifier.naturalDecayRate * DeltaTime), modifier.MaxValue);
-               modBuffer[i] = modifier;
+               modifier.CurrentValue = math.max(0, math.min(modifier.CurrentValue - (modifier.naturalDecayRate * DeltaTime), modifier.MaxValue));
+               initialBuffer[i] = modifier;
             }
-            Debug.Log($"{modBuffer[i].ModType} changed to {modBuffer[i].CurrentValue}");
+         }
+
+         for (int i = 0; i < initialBuffer.Length; ++i)
+         {
+            modBuffer.Add(initialBuffer[i]);
          }
       }
 
@@ -82,6 +75,7 @@ public partial struct ModifierDrainSystem : ISystem
             }
             case ModifierType.Thirst:
             {
+               
                for (int i = 0; i < modBuffer.Length; ++i)
                {
                   if (modBuffer[i].ModType == ModifierType.Health)
@@ -97,7 +91,7 @@ public partial struct ModifierDrainSystem : ISystem
             }
             case ModifierType.Health:
             {
-               ecb.DestroyEntity(chunkIndex, target);
+               //ecb.DestroyEntity(chunkIndex, target);
                //TODO this is likely where we can set the animation?
                break;
             }

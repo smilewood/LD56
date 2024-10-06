@@ -72,7 +72,7 @@ public partial struct FoodFinderSystem : ISystem
       [ReadOnly]
       public ComponentLookup<DestinationCapicityData> capicatity;
 
-      private void Execute([ChunkIndexInQuery] int chunkIndex, in DynamicBuffer<ModifierData> modifiers, in LocalToWorld transform, Entity ent)
+      private void Execute(ref DestinationDesireData desires, ref DynamicBuffer<ModifierData> modifiers, in LocalToWorld transform)
       {
          ModifierData hunger = default;
          for (int i = 0; i < modifiers.Length; ++i)
@@ -109,7 +109,12 @@ public partial struct FoodFinderSystem : ISystem
          }
          if(bestTargetDist != math.INFINITY)
          {
-            ecb.AppendToBuffer(chunkIndex, ent, new DestinationDesireData { target = bestTarget, weight = weight });
+            desires.foodWeight = weight;
+            desires.foodTarget = bestTarget;
+         }
+         else
+         {
+            desires.foodWeight = -1;
          }
       }
    }
