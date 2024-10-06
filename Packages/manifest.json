@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "com.tonymax.nsprites": "https://github.com/Antoshidza/NSprites.git",
     "com.unity.2d.aseprite": "1.1.6",
     "com.unity.2d.pixel-perfect": "5.0.3",
     "com.unity.2d.sprite": "1.0.0",
