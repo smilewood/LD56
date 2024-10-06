@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7952683427612478326
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2594544463968805470}
+  - component: {fileID: 744683997168135649}
+  m_Layer: 0
+  m_Name: EconomyManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2594544463968805470
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7952683427612478326}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.1973646, y: 1.8299325, z: -0.083589256}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &744683997168135649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7952683427612478326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4686967b8488284f85aa82ce03f74e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Balance:
+    Biomass: 0
+    Ore: 0
+    Bread: 0
+  buildingMetadataList:
+  - Biomass: 2000
+    Ore: 500
+    Bread: 0
+    Prefab: {fileID: 5581975287959866455, guid: affeeb437fd454044a9ab3340d2708da,
+      type: 3}
+    BuildingType: 0
+  - Biomass: 500
+    Ore: 2000
+    Bread: 0
+    Prefab: {fileID: 7986364916392778829, guid: a9aff4f48aee4a2489503d223a3b34b5,
+      type: 3}
+    BuildingType: 1
+  - Biomass: 5000
+    Ore: 1500
+    Bread: 750
+    Prefab: {fileID: 6454332980243984289, guid: 1433651925f69f14880b741d722f638f,
+      type: 3}
+    BuildingType: 2
+  - Biomass: 1500
+    Ore: 5000
+    Bread: 750
+    Prefab: {fileID: 4851531501724965281, guid: 65f265bcdbc3ad747a3a68258373242b,
+      type: 3}
+    BuildingType: 3
+  - Biomass: 7500
+    Ore: 5000
+    Bread: 0
+    Prefab: {fileID: 1393366967201853806, guid: 992b8f008c784ff4aac2b4f06a35804d,
+      type: 3}
+    BuildingType: 4
+  - Biomass: 100000
+    Ore: 100000
+    Bread: 25000
+    Prefab: {fileID: 6520872950962820648, guid: f08662d1ec3e1b34db6a470713c99335,
+      type: 3}
+    BuildingType: 5
