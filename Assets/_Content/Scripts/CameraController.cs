@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 using vegeo;
 
 public class CameraController : MonoBehaviour
@@ -21,9 +22,12 @@ public class CameraController : MonoBehaviour
     public float PanBorderThickness = 10f;
 
     [Header("References")]
-    [SerializeField] private Transform _focusTransform;
+    [SerializeField] private Rigidbody _focus;
     [SerializeField] private Transform _highPosition;
     [SerializeField] private Transform _lowPosition;
+    [SerializeField] private Volume _closeDofVolume;
+    [SerializeField] private Volume _farDofVolume;
+
     private Camera _camera;
 
     private Vector3 _targetPosition;
@@ -66,40 +70,49 @@ public class CameraController : MonoBehaviour
         if (Mouse.current.scroll.y.ReadValue() != 0 && AllowMouseInput)
             _zoomValue = Mathf.Clamp01(_zoomValue + Mathf.Sign(Mouse.current.scroll.y.ReadValue()) * ScrollZoomAmount);
 
-        //float moveSpeed = Mathf.Lerp(MinMoveSpeed, MaxMoveSpeed, _zoomValue);
         float moveSpeed = Util.map(ZoomSensitivityCurve.Evaluate(_zoomValue), 0f, 1f, MinMoveSpeed, MaxMoveSpeed);
         Vector3 moveDirection = _moveAction.ReadValue<Vector2>().ToXZ();
         moveDirection *= moveSpeed * Time.deltaTime;
 
+        if (Mouse.current.rightButton.isPressed && AllowMouseInput)
+        {
+            _focus.transform.eulerAngles += new Vector3(0, Mouse.current.delta.x.ReadValue() * MouseRotationSpeed, 0);
+        }
+        _focus.transform.eulerAngles += new Vector3(0, _rotateAction.ReadValue<float>() * KeyboardRotationSpeed * Time.deltaTime, 0);
+
+        Vector3 targetPosition = Vector3.Lerp(_lowPosition.position, _highPosition.position, _zoomValue);
+        _camera.transform.position = Vector3.Lerp(_camera.transform.position, targetPosition, _lerpingSpeed * Time.deltaTime);
+
+        _closeDofVolume.weight = 1f - _zoomValue;
+        _farDofVolume.weight = _zoomValue;
+    }
+
+    private void FixedUpdate()
+    {
+        float moveSpeed = Util.map(ZoomSensitivityCurve.Evaluate(_zoomValue), 0f, 1f, MinMoveSpeed, MaxMoveSpeed);
+        Vector3 moveDirection = _moveAction.ReadValue<Vector2>().ToXZ();
+
         if (Mouse.current.position.y.ReadValue() >= Screen.height - PanBorderThickness)
         {
-            moveDirection += Vector3.forward * moveSpeed * Time.deltaTime;
+            moveDirection += Vector3.forward;
         }
         if (Mouse.current.position.y.ReadValue() <= PanBorderThickness)
         {
-            moveDirection -= Vector3.forward * moveSpeed * Time.deltaTime;
+            moveDirection -= Vector3.forward;
         }
         if (Mouse.current.position.x.ReadValue() >= Screen.width - PanBorderThickness)
         {
-            moveDirection += Vector3.right * moveSpeed * Time.deltaTime;
+            moveDirection += Vector3.right;
         }
         if (Mouse.current.position.x.ReadValue() <= PanBorderThickness)
         {
-            moveDirection -= Vector3.right * moveSpeed * Time.deltaTime;
+            moveDirection -= Vector3.right;
         }
 
-        _focusTransform.position += _focusTransform.TransformDirection(moveDirection);
-        moveDirection.z = 0;
-        _camera.transform.position += _focusTransform.TransformDirection(moveDirection);
+        moveDirection *= moveSpeed * Time.fixedDeltaTime;
 
-        if (Mouse.current.rightButton.isPressed && AllowMouseInput)
-        {
-            _focusTransform.eulerAngles += new Vector3(0, Mouse.current.delta.x.ReadValue() * MouseRotationSpeed, 0);
-        }
-        _focusTransform.eulerAngles += new Vector3(0, _rotateAction.ReadValue<float>() * KeyboardRotationSpeed * Time.deltaTime, 0);
-
-
-        _targetPosition = Vector3.Lerp(_lowPosition.position, _highPosition.position, _zoomValue);
-        _camera.transform.position = Vector3.Lerp(_camera.transform.position, _targetPosition, Time.deltaTime * _lerpingSpeed);
+        Vector3 velocity = _focus.transform.TransformDirection(moveDirection);
+        velocity.y = 0;
+        _focus.velocity = velocity;
     }
 }
