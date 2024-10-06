@@ -91,7 +91,7 @@ public partial struct ModifierDrainSystem : ISystem
             }
             case ModifierType.Health:
             {
-               //ecb.DestroyEntity(chunkIndex, target);
+               ecb.DestroyEntity(chunkIndex, target);
                //TODO this is likely where we can set the animation?
                break;
             }
