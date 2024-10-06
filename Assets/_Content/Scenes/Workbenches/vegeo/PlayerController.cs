@@ -5,7 +5,8 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private InputActionAsset _inputActions;
-    [SerializeField] private Transform _buildUI;
+    [SerializeField] private Transform _contextMenu;
+    [SerializeField] private Transform _buildMenu;
     [SerializeField] private GameObject _testPrefab;
     [SerializeField] private CameraController _cameraController;
     [Header("Building Mode")]
@@ -41,31 +42,24 @@ public class PlayerController : MonoBehaviour
             case PlayerState.Placing:
                 HandlePlacingState();
                 break;
+            case PlayerState.UI:
+                HandleUIState();
+                break;
         }
     }
 
     private void HandleNoneState()
     {
         _cameraController.AllowMouseInput = true;
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        Physics.Raycast(ray, out hit);
 
-        if (!EventSystem.current.IsPointerOverGameObject())
+        Transform hoveredObject = hit.collider?.transform;
+
+        if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            if (_buildUI.gameObject.activeSelf)
-            {
-                _buildUI.gameObject.SetActive(false);
-            }
-
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-            Physics.Raycast(ray, out hit);
-
-            Transform hoveredObject = hit.collider?.transform;
-
-            if (Mouse.current.leftButton.wasPressedThisFrame)
-            {
-                _buildUI.gameObject.SetActive(true);
-                _buildUI.position = Mouse.current.position.ReadValue();
-            }
+            OpenContextMenu(hoveredObject);
         }
     }
 
@@ -100,13 +94,44 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void StartBuildingPlacement()
+    private void HandleUIState()
+    {
+        if (!EventSystem.current.IsPointerOverGameObject())
+        {
+            _contextMenu.gameObject.SetActive(false);
+            _buildMenu.gameObject.SetActive(false);
+            State = PlayerState.None;
+        }
+    }
+
+    private void OpenContextMenu(Transform hoveredObject)
+    {
+        _contextMenu.gameObject.SetActive(true);
+
+        _contextMenu.position = Mouse.current.position.ReadValue();
+
+        State = PlayerState.UI;
+    }
+
+    public void StartBuildingMenu()
+    {
+        _contextMenu.gameObject.SetActive(false);
+        _buildMenu.gameObject.SetActive(true);
+
+        _buildMenu.position = Mouse.current.position.ReadValue();
+
+        State = PlayerState.UI;
+    }
+
+    public void StartBuildingPlacement(int index)
     {
         State = PlayerState.Placing;
 
-        _buildUI.gameObject.SetActive(false);
+        _buildMenu.gameObject.SetActive(false);
 
-        _currentBuilding = Instantiate(_testPrefab, _buildModeGroup);
+        GameObject prefab = EconomyManager.Instance.GetBuildingMetadata((BuildingType)index).Prefab;
+
+        _currentBuilding = Instantiate(prefab, _buildModeGroup);
         _currentBuilding.transform.localPosition = Vector3.zero;
         _currentBuilding.transform.localRotation = Quaternion.identity;
         _currentBuilding.SetActive(false);
@@ -172,6 +197,7 @@ public class PlayerController : MonoBehaviour
     public enum PlayerState
     {
         None,
-        Placing
+        Placing,
+        UI
     }
 }
