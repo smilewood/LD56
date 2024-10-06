@@ -15,7 +15,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Zoom",
+                    "name": "RotateBuilding",
                     "type": "Button",
                     "id": "1c205e77-bbb7-424b-ae72-a0ce973e62b5",
                     "expectedControlType": "Button",
@@ -96,7 +96,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Zoom",
+                    "action": "RotateBuilding",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -107,7 +107,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Zoom",
+                    "action": "RotateBuilding",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -118,13 +118,13 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Zoom",
+                    "action": "RotateBuilding",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
                 {
                     "name": "1D Axis",
-                    "id": "1b270599-bfd7-477d-8005-c09de3a916e6",
+                    "id": "eb72cd8f-1768-455a-9d24-b1de85bd8a00",
                     "path": "1DAxis",
                     "interactions": "",
                     "processors": "",
@@ -135,8 +135,8 @@
                 },
                 {
                     "name": "negative",
-                    "id": "dd166a80-f0a5-4b1c-a76b-e5cfc00be713",
-                    "path": "<Keyboard>/e",
+                    "id": "77396449-af58-4467-956f-aa01d8acc28d",
+                    "path": "<Keyboard>/q",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -146,8 +146,8 @@
                 },
                 {
                     "name": "positive",
-                    "id": "0802544b-b845-48c5-a46d-b16d51ca6561",
-                    "path": "<Keyboard>/q",
+                    "id": "15bd1e80-4635-4162-981a-d8ceb0a1e67a",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

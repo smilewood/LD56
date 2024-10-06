@@ -19,5 +19,15 @@ namespace vegeo
             }
             return Vector3.zero;
         }
+
+        public static Vector3 ToXZ(this Vector2 vector)
+        {
+            return new Vector3(vector.x, 0, vector.y);
+        }
+
+        public static float map(float s, float a1, float a2, float b1, float b2)
+        {
+            return b1 + (s - a1) * (b2 - b1) / (a2 - a1);
+        }
     }
 }
