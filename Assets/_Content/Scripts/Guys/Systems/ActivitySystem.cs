@@ -5,6 +5,8 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
+using Unity.Transforms;
 using UnityEditor;
 using UnityEngine;
 
@@ -17,7 +19,28 @@ public partial struct ActivitySystem : ISystem
 
       new ProcessActivityTimer { deltaTime = SystemAPI.Time.DeltaTime, Ecb = ecb }.ScheduleParallel();
       new ProcessActivityChanges { deltaTime = SystemAPI.Time.DeltaTime }.ScheduleParallel();
+      new MoveToActivityJob { deltaTime = SystemAPI.Time.DeltaTime }.ScheduleParallel();
+
    }
+
+   public partial struct MoveToActivityJob : IJobEntity
+   {
+      public float deltaTime;
+
+      private void Execute(
+         in ActivityData activity, 
+         in MoveSpeedData moveSpeed,
+         ref LocalToWorld world,
+         ref PhysicsVelocity physicsVelocity
+         )
+      {
+         float3 targetvelocity = math.normalizesafe(activity.Location - world.Position);
+         targetvelocity.y = 0;
+         physicsVelocity.Linear += 0.25f * deltaTime * moveSpeed.MoveSpeed * targetvelocity;
+      }
+
+   }
+
 
    [BurstCompile]
    public partial struct ProcessActivityTimer : IJobEntity

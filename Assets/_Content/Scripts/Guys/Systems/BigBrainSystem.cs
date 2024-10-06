@@ -62,7 +62,7 @@ public partial struct BigBrainSystem : ISystem
 
 
          //TODO: I think there is data somewhere to adjust the approach distance
-         float approach = 1;
+         float approach = 2;
 
 
          if (maxWeight != -math.INFINITY)

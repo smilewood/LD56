@@ -4,6 +4,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
 
@@ -42,7 +43,8 @@ public partial struct MovmentToDestinationSystem : ISystem
       private void Execute([ChunkIndexInQuery] int chunkIndex, 
          in MoveSpeedData moveSpeed, 
          ref CurrentDestinationData destination, 
-         ref LocalTransform world,
+         ref LocalToWorld world,
+         ref PhysicsVelocity physicsVelocity,
          Entity target)
       {
          DestinationCapicityData destCapicity = capicity[destination.destination];
@@ -55,7 +57,8 @@ public partial struct MovmentToDestinationSystem : ISystem
                {
                   remainingTime = foodStation.EatingTime,
                   reservedSpot = destCapicity,
-                  Activity = ActivityType.Eat
+                  Activity = ActivityType.Eat,
+                  Location = destination.destinationLocation
                });
             }
             else if (drinkStations.TryGetComponent(destination.destination, out DrinkStationData drinkStation))
@@ -64,7 +67,8 @@ public partial struct MovmentToDestinationSystem : ISystem
                {
                   remainingTime = drinkStation.DrinkTime,
                   reservedSpot = destCapicity,
-                  Activity = ActivityType.Drink
+                  Activity = ActivityType.Drink,
+                  Location = destination.destinationLocation
                });
             }
             else if (workStations.TryGetComponent(destination.destination, out WorkStationData workStation))
@@ -74,13 +78,15 @@ public partial struct MovmentToDestinationSystem : ISystem
                   remainingTime = workStation.WorkTime,
                   reservedSpot = destCapicity,
                   Activity = ActivityType.Produce,
-                  ActivityTarget = workStation.WorkResultPrefab
+                  ActivityTarget = workStation.WorkResultPrefab,
+                  Location = destination.destinationLocation
                });
             }
             else
             {
                Debug.LogError("We got somewhere without a work type");
             }
+            //physicsVelocity.Linear = 0;
          }
          else if(destCapicity.OpenSlots <= 0)
          {
@@ -89,9 +95,10 @@ public partial struct MovmentToDestinationSystem : ISystem
          }
          else
          {
-           // Debug.Log("Moving To Destination");
-            Ecb.SetComponent(chunkIndex, target,
-               LocalTransform.FromPosition(world.Position + math.normalize(destination.destinationLocation - world.Position) * moveSpeed.MoveSpeed * moveSpeed.MoveMult * deltaTime));
+            float3 targetvelocity = math.normalizesafe(destination.destinationLocation - world.Position);
+            targetvelocity.y = .1f;
+            physicsVelocity.Linear += deltaTime * moveSpeed.MoveSpeed * targetvelocity;
+            
          }
       }
    }

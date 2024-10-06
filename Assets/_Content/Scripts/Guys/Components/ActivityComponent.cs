@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 public enum ActivityType
@@ -11,6 +12,7 @@ public enum ActivityType
 public struct ActivityData : IComponentData
 {
    public float remainingTime;
+   public float3 Location;
    public DestinationCapicityData reservedSpot;
    public ActivityType Activity;
    public Entity ActivityTarget;
