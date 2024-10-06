@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 296769185523943797}
   - component: {fileID: 8341646490158253943}
-  - component: {fileID: 1845546595022398718}
   - component: {fileID: 8380316081276769042}
   - component: {fileID: 5010435516154323669}
   m_Layer: 0
@@ -69,14 +68,6 @@ MonoBehaviour:
     sound: 4
   - AudioClip: {fileID: 8300000, guid: 0435f8af6ba86d2488e31b1bde60dc20, type: 3}
     sound: 4
---- !u!81 &1845546595022398718
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6839518438182109695}
-  m_Enabled: 1
 --- !u!82 &8380316081276769042
 AudioSource:
   m_ObjectHideFlags: 0
