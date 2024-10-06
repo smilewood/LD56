@@ -21,7 +21,7 @@ public class BuildingManager : MonoBehaviour
 
    void Start()
    {
-      EconomyManager = GameObject.FindGameObjectWithTag("EcnomyManager").GetComponent<EconomyManager>();
+        EconomyManager = EconomyManager.Instance;
    }
 
    /// <summary>

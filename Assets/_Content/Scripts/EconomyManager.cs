@@ -33,7 +33,21 @@ public sealed class BuildingMetadata : CurrencyData
 /// </summary>
 public class EconomyManager : MonoBehaviour
 {
-   public CurrencyData Balance;
+   private static EconomyManager _instance;
+    public static EconomyManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = FindObjectOfType<EconomyManager>();
+            }
+
+            return _instance;
+        }
+    }
+
+    public CurrencyData Balance;
 
    [SerializeField]
    private List<BuildingMetadata> buildingMetadataList = new List<BuildingMetadata>();
