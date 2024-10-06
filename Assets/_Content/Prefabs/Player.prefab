@@ -2001,6 +2001,9 @@ MonoBehaviour:
   _buildingRaycastMask:
     serializedVersion: 2
     m_Bits: 128
+  _interactionRaycastMask:
+    serializedVersion: 2
+    m_Bits: 512
   _buildingRotateAmount: 15
 --- !u!1 &7563400211610797597
 GameObject:

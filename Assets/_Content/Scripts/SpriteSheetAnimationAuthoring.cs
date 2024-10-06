@@ -83,7 +83,7 @@ public partial struct SpriteSheetAnimationSystem : ISystem
             float uvWidth = 1f / spriteSheetAnimation.frameCount;
             float uvHeight = 1f / (spriteSheetAnimation.animationCount * spriteSheetAnimation.creatureCount);
             float uvOffsetX = uvWidth * (int)spriteSheetAnimation.animationTime;
-            float uvOffsetY = uvHeight * spriteSheetAnimation.animationIndex + (uvHeight * spriteSheetAnimation.animationCount * spriteSheetAnimation.creatureIndex);
+            float uvOffsetY = uvHeight * (spriteSheetAnimation.animationIndex + spriteSheetAnimation.animationCount * spriteSheetAnimation.creatureIndex);
             spriteSheetAnimation.uv = new Vector4(uvWidth, uvHeight, uvOffsetX, uvOffsetY);
 
             spriteSheetAnimation.matrix = Matrix4x4.TRS(localToWorld.Position + new float3(0, 0.5f,0), Quaternion.identity, Vector3.one);

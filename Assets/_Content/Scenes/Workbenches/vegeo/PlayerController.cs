@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform _previewParent;
     [SerializeField] private Material _previewMaterial;
     [SerializeField] private LayerMask _buildingRaycastMask;
+    [SerializeField] private LayerMask _interactionRaycastMask;
     [SerializeField] private float _buildingRotateAmount = 15f;
 
     private InputAction _rotateBuildingAction;
@@ -22,6 +23,7 @@ public class PlayerController : MonoBehaviour
     private BuildingPreview _buildingPreview;
 
     private float _timeStartedBuilding;
+    private Interactable _lastHoveredInteractable;
 
     public PlayerState State { get; private set; }
 
@@ -53,9 +55,28 @@ public class PlayerController : MonoBehaviour
         _cameraController.AllowMouseInput = true;
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-        Physics.Raycast(ray, out hit);
+        Physics.Raycast(ray, out hit, 75f, _interactionRaycastMask);
 
-        Transform hoveredObject = hit.collider?.transform;
+        Interactable hoveredObject = hit.collider?.GetComponentInParent<Interactable>();
+
+        if (hoveredObject)
+        {
+            if (_lastHoveredInteractable != null && _lastHoveredInteractable != hoveredObject)
+            {
+                _lastHoveredInteractable.Unhighlight();
+            }
+
+            hoveredObject.Highlight();
+            _lastHoveredInteractable = hoveredObject;
+        }
+        else
+        {
+            if (_lastHoveredInteractable != null)
+            {
+                _lastHoveredInteractable.Unhighlight();
+                _lastHoveredInteractable = null;
+            }
+        }
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
@@ -104,7 +125,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void OpenContextMenu(Transform hoveredObject)
+    private void OpenContextMenu(Interactable hoveredObject)
     {
         _contextMenu.gameObject.SetActive(true);
 
