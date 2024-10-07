@@ -163,10 +163,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   color: {r: 1, g: 1, b: 1, a: 1}
-  creatureIndex: 1
+  creatureIndex: 2
   animationIndex: 7
   animationCount: 7
-  creatureCount: 3
+  creatureCount: 4
   frameCount: 6
   fps: 12
 --- !u!114 &3208743720891388766

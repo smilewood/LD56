@@ -15,7 +15,7 @@ public class MoveSpeedBaker : Baker<MoveSpeedComponent>
 {
    public override void Bake(MoveSpeedComponent authoring)
    {
-      Entity target = GetEntity(TransformUsageFlags.None);
+      Entity target = GetEntity(TransformUsageFlags.Dynamic);
       AddComponent(target, new MoveSpeedData
       {
          MoveSpeed = authoring.speed + Random.Range(-.5f, .5f),

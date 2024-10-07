@@ -41,7 +41,7 @@ public class BigBrainBaker : Baker<BigBrainComponent>
 {
    public override void Bake(BigBrainComponent authoring)
    {
-      Entity target = GetEntity(TransformUsageFlags.None);
+      Entity target = GetEntity(TransformUsageFlags.Dynamic);
       AddComponent(target, new BigBrainData { ReconsiderTimer = 30, ReproduceCooldown = authoring.ReproduceTime, ReproduceTimer = authoring.ReproduceTime });
       AddComponent(target, new DestinationDesireData { });
    }
