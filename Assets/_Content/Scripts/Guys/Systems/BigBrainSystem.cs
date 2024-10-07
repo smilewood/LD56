@@ -19,14 +19,28 @@ public partial struct BigBrainSystem : ISystem
    {
       EntityCommandBuffer.ParallelWriter ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
       EntityQuery needDestQuery = SystemAPI.QueryBuilder()
-         .WithAll<DestinationDesireData>()
+         .WithAll<DestinationDesireData, SpriteSheetAnimation, BigBrainData>()
          .WithAbsent<ActivityData, CurrentDestinationData>().Build();
       new DestinationChoiceJob
       {
          Ecb = ecb,
          locations = SystemAPI.GetComponentLookup<LocalToWorld>()
       }.ScheduleParallel(needDestQuery);
+      new BrainTimerJob { deltaTime = SystemAPI.Time.DeltaTime }.ScheduleParallel();
+   }
 
+   [BurstCompile]
+
+   public partial struct BrainTimerJob : IJobEntity
+   {
+      public float deltaTime;
+      private void Execute(ref BigBrainData brain)
+      {
+         if(brain.ReconsiderTimer > 0)
+         {
+            brain.ReconsiderTimer -= deltaTime;
+         }
+      }
    }
 
    [BurstCompile]
@@ -37,7 +51,7 @@ public partial struct BigBrainSystem : ISystem
       public ComponentLookup<LocalToWorld> locations;
 
 
-      public void Execute([ChunkIndexInQuery] int chunkIndex, in DestinationDesireData desire, Entity target)
+      public void Execute([ChunkIndexInQuery] int chunkIndex, in DestinationDesireData desire, ref SpriteSheetAnimation animator, ref BigBrainData brain, Entity target)
       {
          float maxWeight = -math.INFINITY;
          Entity maxTarget = default;
@@ -73,6 +87,8 @@ public partial struct BigBrainSystem : ISystem
                destinationLocation = locations[maxTarget].Position,
                ApproachRadius = approach
             });
+            animator.animationIndex = 7;
+            brain.ReconsiderTimer = 15;
          }
       }
 

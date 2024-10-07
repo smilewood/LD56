@@ -22,7 +22,9 @@ public partial struct MovmentToDestinationSystem : ISystem
          foodStations = SystemAPI.GetComponentLookup<FoodStationData>(),
          drinkStations = SystemAPI.GetComponentLookup<DrinkStationData>(),
          capicity = SystemAPI.GetComponentLookup<DestinationCapicityData>(),
-         workStations = SystemAPI.GetComponentLookup<WorkStationData>()
+         workStations = SystemAPI.GetComponentLookup<WorkStationData>(),
+         haulableStuff = SystemAPI.GetComponentLookup<HaulableData>(),
+         dropStations = SystemAPI.GetComponentLookup<DropPointData>()
       }.ScheduleParallel();
    }
 
@@ -38,6 +40,10 @@ public partial struct MovmentToDestinationSystem : ISystem
       [ReadOnly]
       public ComponentLookup<WorkStationData> workStations;
       [ReadOnly]
+      public ComponentLookup<HaulableData> haulableStuff;
+      [ReadOnly]
+      public ComponentLookup<DropPointData> dropStations;
+      [ReadOnly]
       public ComponentLookup<DestinationCapicityData> capicity;
 
       private void Execute([ChunkIndexInQuery] int chunkIndex, 
@@ -45,11 +51,14 @@ public partial struct MovmentToDestinationSystem : ISystem
          ref CurrentDestinationData destination, 
          ref LocalToWorld world,
          ref PhysicsVelocity physicsVelocity,
+         ref SpriteSheetAnimation animator,
+         ref BigBrainData brain,
          Entity target)
       {
          DestinationCapicityData destCapicity = capicity[destination.destination];
          if (math.distance(world.Position, destination.destinationLocation) < destination.ApproachRadius)
          {
+            
             Ecb.RemoveComponent<CurrentDestinationData>(chunkIndex, target);
             if (foodStations.TryGetComponent(destination.destination, out FoodStationData foodStation))
             {
@@ -60,6 +69,7 @@ public partial struct MovmentToDestinationSystem : ISystem
                   Activity = ActivityType.Eat,
                   Location = destination.destinationLocation
                });
+               animator.animationIndex = 8;
             }
             else if (drinkStations.TryGetComponent(destination.destination, out DrinkStationData drinkStation))
             {
@@ -70,6 +80,7 @@ public partial struct MovmentToDestinationSystem : ISystem
                   Activity = ActivityType.Drink,
                   Location = destination.destinationLocation
                });
+               animator.animationIndex = 8;
             }
             else if (workStations.TryGetComponent(destination.destination, out WorkStationData workStation))
             {
@@ -81,6 +92,27 @@ public partial struct MovmentToDestinationSystem : ISystem
                   ActivityTarget = workStation.WorkResultPrefab,
                   Location = destination.destinationLocation
                });
+               animator.animationIndex = 6;
+            }
+            else if (haulableStuff.TryGetComponent(destination.destination, out HaulableData _))
+            {
+               Ecb.AddComponent(chunkIndex, target, new ActivityData
+               {
+                  remainingTime = 0.1f,
+                  Activity = ActivityType.PickUp,
+                  ActivityTarget = destination.destination,
+                  Location = destination.destinationLocation
+               });
+            }
+            else if(dropStations.TryGetComponent(destination.destination, out DropPointData dropPoint))
+            {
+               Ecb.AddComponent(chunkIndex, target, new ActivityData
+               {
+                  remainingTime = 0.1f,
+                  Activity = ActivityType.DropOff,
+                  ActivityTarget = destination.destination,
+                  Location = destination.destinationLocation
+               });
             }
             else
             {
@@ -88,17 +120,16 @@ public partial struct MovmentToDestinationSystem : ISystem
             }
             //physicsVelocity.Linear = 0;
          }
-         else if(destCapicity.OpenSlots <= 0)
+         else if(destCapicity.OpenSlots <= 0 || brain.ReconsiderTimer <= 0)
          {
-            //Someone took my spot, just give up
             Ecb.RemoveComponent<CurrentDestinationData>(chunkIndex, target);
+            animator.animationIndex = 9;
          }
          else
          {
             float3 targetvelocity = math.normalizesafe(destination.destinationLocation - world.Position);
-            targetvelocity.y = .1f;
+            targetvelocity.y = .3f;
             physicsVelocity.Linear += deltaTime * moveSpeed.MoveSpeed * targetvelocity;
-            
          }
       }
    }

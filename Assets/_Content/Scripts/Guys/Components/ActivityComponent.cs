@@ -6,7 +6,7 @@ using UnityEngine;
 
 public enum ActivityType
 {
-   Eat, Drink, Produce, Clean
+   Eat, Drink, Produce, Clean, PickUp, DropOff
 }
 
 public struct ActivityData : IComponentData

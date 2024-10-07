@@ -19,10 +19,16 @@ public partial struct ActivitySystem : ISystem
 
       new ProcessActivityTimer { deltaTime = SystemAPI.Time.DeltaTime, Ecb = ecb }.ScheduleParallel();
       new ProcessActivityChanges { deltaTime = SystemAPI.Time.DeltaTime }.ScheduleParallel();
+
+      new ProcessProducerActivity { Ecb = ecb }.ScheduleParallel();
+      new ProcessHaulerActivity { Ecb = ecb }.ScheduleParallel();
+      new ProcessCleanerActivity { Ecb = ecb }.ScheduleParallel();
+
       new MoveToActivityJob { deltaTime = SystemAPI.Time.DeltaTime }.ScheduleParallel();
 
    }
 
+   [BurstCompile]
    public partial struct MoveToActivityJob : IJobEntity
    {
       public float deltaTime;
@@ -41,39 +47,75 @@ public partial struct ActivitySystem : ISystem
 
    }
 
+   [BurstCompile]
+   public partial struct ProcessProducerActivity : IJobEntity
+   {
+      public EntityCommandBuffer.ParallelWriter Ecb;
+
+      private void Execute([ChunkIndexInQuery] int chunkIndex, in ProducerStateData _, in ActivityData activity, ref SpriteSheetAnimation animator)
+      {
+         if(activity.remainingTime <= 0)
+         {
+            animator.animationIndex = 5;
+            Ecb.Instantiate(chunkIndex, activity.ActivityTarget);
+         }
+      }
+   }
+
+   [BurstCompile]
+   public partial struct ProcessHaulerActivity : IJobEntity
+   {
+      public EntityCommandBuffer.ParallelWriter Ecb;
+
+      private void Execute([ChunkIndexInQuery] int chunkIndex, ref HaulerStateData hauler, in ActivityData activity, ref SpriteSheetAnimation animator, Entity target)
+      {
+         if (activity.remainingTime <= 0)
+         {
+            if (!hauler.Hauling)
+            {
+               animator.animationIndex = 3;
+               hauler.Hauling = true;
+               Ecb.DestroyEntity(chunkIndex, activity.ActivityTarget);
+            }
+            else
+            {
+               animator.animationIndex = 5;
+               hauler.Hauling = false;
+               //This is where we need to notify the game that the hauling is complete
+            }
+         }
+      }
+   }
+
+   [BurstCompile]
+   public partial struct ProcessCleanerActivity : IJobEntity
+   {
+      public EntityCommandBuffer.ParallelWriter Ecb;
+
+      private void Execute([ChunkIndexInQuery] int chunkIndex, in CleanerStateData _, in ActivityData activity, ref SpriteSheetAnimation animator)
+      {
+         if (activity.remainingTime <= 0)
+         {
+            animator.animationIndex = 5;
+            Ecb.DestroyEntity(chunkIndex, activity.ActivityTarget);
+         }
+      }
+   }
 
    [BurstCompile]
    public partial struct ProcessActivityTimer : IJobEntity
    {
       public EntityCommandBuffer.ParallelWriter Ecb;
       public float deltaTime;
-      private void Execute([ChunkIndexInQuery] int chunkIndex, ref ActivityData activity, Entity target)
+      private void Execute([ChunkIndexInQuery] int chunkIndex, ref ActivityData activity, ref SpriteSheetAnimation animator, Entity target)
       {
          if(activity.remainingTime < 0)
          {
-            HandleActivityEnd(chunkIndex, ref activity);
             Ecb.RemoveComponent<ActivityData>(chunkIndex, target);
          }
          else
          {
             activity.remainingTime -= deltaTime;
-         }
-      }
-
-      private void HandleActivityEnd(int chunkIndex, ref ActivityData activity)
-      {
-         switch (activity.Activity)
-         {
-            case ActivityType.Produce:
-            {
-               Ecb.Instantiate(chunkIndex, activity.ActivityTarget);
-               break;
-            }
-            case ActivityType.Clean:
-            {
-               Ecb.DestroyEntity(chunkIndex, activity.ActivityTarget);
-               break;
-            }
          }
       }
    }
