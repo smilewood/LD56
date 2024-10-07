@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -52,6 +53,44 @@ public class EconomyManager : MonoBehaviour
    [SerializeField]
    private List<BuildingMetadata> buildingMetadataList = new List<BuildingMetadata>();
 
+   public int DudePurchaseCount = 0;
+
+   private void Start()
+   {
+      AudioManager mgr = GameObject.FindGameObjectWithTag("AudioManager").GetComponent<AudioManager>();
+      StartCoroutine(PlayGuyNoises(mgr));
+   }
+
+   public IEnumerator PlayGuyNoises(AudioManager mgr)
+   {
+      float time = UnityEngine.Random.Range(1, 10);
+
+      while (true)
+      {
+         float factor = 1f;
+
+         if (DudePurchaseCount > 0)
+         {
+            factor = 3f;
+         }
+         else if (DudePurchaseCount > 50)
+         {
+            factor = 1.5f;
+         }
+         else if (DudePurchaseCount > 100)
+         {
+            factor = 0.5f;
+         }
+
+         if ( DudePurchaseCount > 0)
+         {
+            mgr.PlayTransmutiteCall();
+         }
+            
+         yield return new WaitForSeconds(time * factor);
+      }
+   }
+
    /// <summary>
    /// Checks if the cost of an object is less than the player's balance
    /// </summary>
@@ -78,6 +117,13 @@ public class EconomyManager : MonoBehaviour
          Balance.Biomass -= purchase.Biomass;
          Balance.Ore -= purchase.Ore;
          Balance.Bread -= purchase.Bread;
+
+         int cost = purchase.Biomass + purchase.Ore + purchase.Bread;
+
+         if (cost < 2000)
+         {
+            DudePurchaseCount += 1;
+         }
 
          return true;
       }
