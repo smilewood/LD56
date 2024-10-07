@@ -152,12 +152,9 @@ public class MenuFunctions : MonoBehaviour
          InGameMenuIsOpen = true;
       }
 
-      Debug.Log("Opening Menu: " + menu);
-
       if (Menus.Any(m => m.name == menu))
       {
          Menus.Find(m => m.name == menu).SetActive(true);
-         Debug.Log("Success");
       }
    }
 
