@@ -130,6 +130,8 @@ public partial struct WorkFinderSystem : ISystem
       private void Execute(ref DestinationDesireData desires, in ProducerStateData _, in LocalToWorld transform)
       {
          float bestTargetDist = math.INFINITY;
+         float bestTargetCapicity = math.INFINITY;
+
          Entity bestTarget = default;
 
          foreach (Entity target in workstations)
@@ -142,9 +144,12 @@ public partial struct WorkFinderSystem : ISystem
                   LocalToWorld targetPos = locations[target];
 
                   float dist = math.abs(math.distance(transform.Position, targetPos.Position));
-                  if (dist < bestTargetDist)
+                  float capicityPercent = seats.CurrentOccupancy / seats.MaxOccupency;
+
+                  if (capicityPercent < bestTargetCapicity || (capicityPercent == bestTargetCapicity && dist < bestTargetDist))
                   {
                      bestTargetDist = dist;
+                     bestTargetCapicity = capicityPercent;
                      bestTarget = target;
                   }
                }
@@ -174,6 +179,7 @@ public partial struct WorkFinderSystem : ISystem
       private void Execute(ref DestinationDesireData desires, in CleanerStateData _, in LocalToWorld transform)
       {
          float bestTargetDist = math.INFINITY;
+         float bestTargetCapicity = math.INFINITY;
          Entity bestTarget = default;
 
          foreach (Entity target in messes)
@@ -185,9 +191,12 @@ public partial struct WorkFinderSystem : ISystem
                   LocalToWorld targetPos = locations[target];
 
                   float dist = math.abs(math.distance(transform.Position, targetPos.Position));
-                  if (dist < bestTargetDist)
+                  float capicityPercent = seats.CurrentOccupancy / seats.MaxOccupency;
+
+                  if(capicityPercent < bestTargetCapicity || (capicityPercent == bestTargetCapicity && dist < bestTargetDist))
                   {
                      bestTargetDist = dist;
+                     bestTargetCapicity = capicityPercent;
                      bestTarget = target;
                   }
                }

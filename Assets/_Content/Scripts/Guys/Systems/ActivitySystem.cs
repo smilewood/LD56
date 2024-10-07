@@ -10,6 +10,11 @@ using Unity.Transforms;
 using UnityEditor;
 using UnityEngine;
 
+public struct DestroyMe : IComponentData
+{
+
+}
+
 public partial struct ActivitySystem : ISystem
 {
    [BurstCompile]
@@ -80,10 +85,7 @@ public partial struct ActivitySystem : ISystem
             {
                hauler.Hauling = true;
                hauler.TypeBeingHauled = haulableStuff[activity.ActivityTarget].Type;
-               if (haulableStuff.EntityExists(activity.ActivityTarget))
-               {
-                  Ecb.DestroyEntity(chunkIndex, activity.ActivityTarget);
-               }
+               Ecb.AddComponent(chunkIndex, activity.ActivityTarget, new DestroyMe { });
                
                animator.animationIndex = 3;
             }
@@ -93,18 +95,18 @@ public partial struct ActivitySystem : ISystem
                animator.animationIndex = 5;
                //This is where we need to notify the game that the hauling is complete
                switch (hauler.TypeBeingHauled)
-                    {
-                        case ResourceType.Bread:
-                            EconomyManager.Instance.Balance.Bread++;
-                            break;
-                        case ResourceType.Ore:
-                            EconomyManager.Instance.Balance.Ore++;
-                            break;
-                        case ResourceType.Biomass:
-                            EconomyManager.Instance.Balance.Biomass++;
-                            break;
-                    }
-                }
+               {
+                  case ResourceType.Bread:
+                  EconomyManager.Instance.Balance.Bread++;
+                  break;
+                  case ResourceType.Ore:
+                  EconomyManager.Instance.Balance.Ore++;
+                  break;
+                  case ResourceType.Biomass:
+                  EconomyManager.Instance.Balance.Biomass++;
+                  break;
+               }
+            }
          }
       }
    }
@@ -122,7 +124,7 @@ public partial struct ActivitySystem : ISystem
             if (activity.remainingTime <= 0)
             {
                animator.animationIndex = 5;
-               Ecb.DestroyEntity(chunkIndex, activity.ActivityTarget);
+               Ecb.AddComponent(chunkIndex, activity.ActivityTarget, new DestroyMe { });
             }
          }
       }
