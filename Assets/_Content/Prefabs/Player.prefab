@@ -121,7 +121,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4732730006195997781}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6346412005143389620}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: BuyCreature
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1959661294970273031
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1296,7 +1308,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1494834989474039200
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1575,7 +1587,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 9130514205290630381}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6346412005143389620}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: BuyCreature
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &5129756963140604968
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1871,7 +1895,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 614545555483861893}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6346412005143389620}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: BuyCreature
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 2
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1442620602296159173
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2004,7 +2040,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -100, y: 0}
+  m_AnchoredPosition: {x: 0, y: -100}
   m_SizeDelta: {x: 80, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7074912365293142487
@@ -2028,7 +2064,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.85882354, g: 0.43379903, b: 0.4, a: 1}
+  m_Color: {r: 0.4, g: 0.85882354, b: 0.85882354, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2088,7 +2124,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5652301931782852182}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6346412005143389620}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: StartCreatureBuyMenu
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &8988750415010880607
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3475,6 +3523,9 @@ GameObject:
   m_Component:
   - component: {fileID: 5257693222769102842}
   - component: {fileID: 6346412005143389620}
+  - component: {fileID: 8233199289785060504}
+  - component: {fileID: 973922819601597362}
+  - component: {fileID: 1637336677340931211}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -3521,6 +3572,10 @@ MonoBehaviour:
   _testPrefab: {fileID: 7196523372963513387, guid: d8144e0910cbd0c46824c99ba93b7132,
     type: 3}
   _cameraController: {fileID: 397416486335468286}
+  _creaturePrefabs:
+  - {fileID: 4334094884803433836, guid: 570f2e6c5488631479d03f183a63e2b8, type: 3}
+  - {fileID: 4334094884803433836, guid: 578289142d21b65448d254f553108ae8, type: 3}
+  - {fileID: 4334094884803433836, guid: 867b9b38873be624fbb6397444f03e89, type: 3}
   _buildModeGroup: {fileID: 7851517710412559724}
   _previewParent: {fileID: 4508257417185898967}
   _previewMaterial: {fileID: 2100000, guid: 805e474e90cc5d74b93b675830cdee49, type: 2}
@@ -3534,9 +3589,59 @@ MonoBehaviour:
   _highlighter: {fileID: 4212807683747627317}
   _capUpgrade: {fileID: 8581481190188162985}
   _opRateUpgrade: {fileID: 5067884896987353533}
+  _deleteBuildingButton: {fileID: 3238016329202039423}
   _creatureBuy: {fileID: 8936756464154592585}
   _entityScene: {fileID: 0}
   _creatureSpawnLocation: {fileID: 0}
+--- !u!114 &8233199289785060504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7413460900230319346}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b19e13d5f396894e9ea4fc8e2170727, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CleanerCount: 0
+  HaulerCount: 0
+  ProducerCount: 0
+--- !u!114 &973922819601597362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7413460900230319346}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e2c4628897cf0d4faad58792cc00acd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  QuadMesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+  CreatureMaterial: {fileID: 2100000, guid: 1f0b8095c0e11394dbe5097a497d0177, type: 2}
+--- !u!114 &1637336677340931211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7413460900230319346}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aabdbc04451ddc943808a3ee200724fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentBuildingSpawnType: 0
+  spawnPosition: {x: 0, y: 0, z: 0}
+  spawnRotation:
+    value:
+      x: 0
+      y: 0
+      z: 0
+      w: 0
 --- !u!1 &7563400211610797597
 GameObject:
   m_ObjectHideFlags: 0
