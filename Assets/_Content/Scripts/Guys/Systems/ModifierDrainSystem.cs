@@ -6,6 +6,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
 public partial struct ModifierDrainSystem : ISystem
@@ -20,6 +21,42 @@ public partial struct ModifierDrainSystem : ISystem
          DeltaTime = SystemAPI.Time.DeltaTime,
          ecb = ecb,
       }.ScheduleParallel();
+      new SpawnNewGuysJob
+      {
+         deltaTime = SystemAPI.Time.DeltaTime,
+         ecb = ecb
+      }.ScheduleParallel();
+
+   }
+   private const float ReproduceThreshold = .75f;
+   public partial struct SpawnNewGuysJob : IJobEntity
+   {
+      public float deltaTime;
+      public EntityCommandBuffer.ParallelWriter ecb;
+
+      private void Execute([ChunkIndexInQuery] int chunkIndex, in DynamicBuffer<ModifierData> initialBuffer, ref BigBrainData brain, Entity target)
+      {
+         for (int i = 0; i < initialBuffer.Length; ++i)
+         {
+            var modifier = initialBuffer[i];
+            if ((modifier.CurrentValue / modifier.MaxValue) < ReproduceThreshold)
+            {
+               Debug.Log($"{modifier.ModType.ToString()} is under the reproduction threshold");
+               brain.ReproduceTimer = brain.ReproduceCooldown;
+               return;
+            }
+         }
+
+         if(brain.ReproduceTimer <= 0)
+         {
+            brain.ReproduceTimer = brain.ReproduceCooldown;
+            ecb.Instantiate(chunkIndex, target);
+         }
+         else
+         {
+            brain.ReproduceTimer -= deltaTime;
+         }
+      }
    }
 
    [BurstCompile]
