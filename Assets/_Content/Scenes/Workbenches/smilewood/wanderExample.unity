@@ -3913,7 +3913,7 @@ PrefabInstance:
     - target: {fileID: 4334094884803433836, guid: 570f2e6c5488631479d03f183a63e2b8,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5125287252664669266, guid: 570f2e6c5488631479d03f183a63e2b8,
         type: 3}
@@ -4130,6 +4130,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Producer
+      objectReference: {fileID: 0}
+    - target: {fileID: 4334094884803433836, guid: 867b9b38873be624fbb6397444f03e89,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5125287252664669266, guid: 867b9b38873be624fbb6397444f03e89,
         type: 3}
@@ -10902,6 +10907,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Hauler
+      objectReference: {fileID: 0}
+    - target: {fileID: 4334094884803433836, guid: 578289142d21b65448d254f553108ae8,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5125287252664669266, guid: 578289142d21b65448d254f553108ae8,
         type: 3}
