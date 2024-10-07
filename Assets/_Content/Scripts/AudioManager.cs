@@ -41,6 +41,7 @@ public class AudioManager : MonoBehaviour
     {
       musicAudioSource.clip = musicClip;
       musicAudioSource.Play();
+      DontDestroyOnLoad(gameObject);
     }
 
    /// <summary>
