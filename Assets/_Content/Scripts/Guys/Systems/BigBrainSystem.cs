@@ -24,7 +24,8 @@ public partial struct BigBrainSystem : ISystem
       new DestinationChoiceJob
       {
          Ecb = ecb,
-         locations = SystemAPI.GetComponentLookup<LocalToWorld>()
+         locations = SystemAPI.GetComponentLookup<LocalToWorld>(),
+         haulers = SystemAPI.GetComponentLookup<HaulerStateData>()
       }.ScheduleParallel(needDestQuery);
       new BrainTimerJob { deltaTime = SystemAPI.Time.DeltaTime }.ScheduleParallel();
    }
@@ -49,6 +50,8 @@ public partial struct BigBrainSystem : ISystem
       public EntityCommandBuffer.ParallelWriter Ecb;
       [ReadOnly]
       public ComponentLookup<LocalToWorld> locations;
+      [ReadOnly]
+      public ComponentLookup<HaulerStateData> haulers;
 
 
       public void Execute([ChunkIndexInQuery] int chunkIndex, in DestinationDesireData desire, ref SpriteSheetAnimation animator, ref BigBrainData brain, Entity target)
@@ -87,7 +90,15 @@ public partial struct BigBrainSystem : ISystem
                destinationLocation = locations[maxTarget].Position,
                ApproachRadius = approach
             });
-            animator.animationIndex = 4;
+
+            if(haulers.TryGetComponent(target, out HaulerStateData data) && data.Hauling)
+            {
+               animator.animationIndex = 3;
+            }
+            else
+            {
+               animator.animationIndex = 4;
+            }
             brain.ReconsiderTimer = 15;
          }
       }
