@@ -27,6 +27,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Button _deleteBuildingButton;
     [SerializeField] private Button _creatureBuy;
     [SerializeField] private SubScene _entityScene;
+    [SerializeField] private Button[] _buildingBuysButtons;
+    [SerializeField] private Button[] _creatureBuyButtons;
     [SerializeField] private Transform _creatureSpawnLocation;
 
     private InputAction _rotateBuildingAction;
@@ -236,6 +238,11 @@ public class PlayerController : MonoBehaviour
 
     public void StartBuildingMenu()
     {
+        for (int i = 0; i < _buildingBuysButtons.Length; i++)
+        {
+            _buildingBuysButtons[i].interactable = EconomyManager.Instance.CanPurchase(EconomyManager.Instance.GetBuildingMetadata((BuildingType)i));
+        }
+
         _contextMenu.gameObject.SetActive(false);
         _buildMenu.gameObject.SetActive(true);
 
@@ -246,6 +253,7 @@ public class PlayerController : MonoBehaviour
 
     public void StartCreatureBuyMenu()
     {
+        RefreshCreatureBuyMenuInteractable();
         _contextMenu.gameObject.SetActive(false);
         _creatureBuyMenu.gameObject.SetActive(true);
 
@@ -254,18 +262,28 @@ public class PlayerController : MonoBehaviour
         State = PlayerState.UI;
     }
 
+    public void RefreshCreatureBuyMenuInteractable()
+    {
+        _creatureBuyButtons[0].interactable = EconomyManager.Instance.CanPurchase(new CurrencyData { Biomass = 100, Ore = 50, Bread = 0 });
+        _creatureBuyButtons[1].interactable = EconomyManager.Instance.CanPurchase(new CurrencyData { Biomass = 75, Ore = 250, Bread = 50 });
+        _creatureBuyButtons[2].interactable = EconomyManager.Instance.CanPurchase(new CurrencyData { Biomass = 500, Ore = 500, Bread = 100 });
+    }
+
     public void BuyCreature(int index)
     {
         switch (index)
         {
             case 0:
-                CreatureSpawnManager.Instance.CleanerCount++;
+                EconomyManager.Instance.TryPurchase(new CurrencyData { Biomass = 100, Ore = 50, Bread = 0 });
+                CreatureSpawnManager.Instance.CleanerCount += 10;
                 break;
             case 1:
-                CreatureSpawnManager.Instance.HaulerCount++;
+                EconomyManager.Instance.TryPurchase(new CurrencyData { Biomass = 75, Ore = 250, Bread = 50 });
+                CreatureSpawnManager.Instance.HaulerCount += 10;
                 break;
             case 2:
-                CreatureSpawnManager.Instance.ProducerCount++;
+                EconomyManager.Instance.TryPurchase(new CurrencyData { Biomass = 500, Ore = 500, Bread = 100 });
+                CreatureSpawnManager.Instance.ProducerCount += 10;
                 break;
         }
     }
@@ -275,6 +293,12 @@ public class PlayerController : MonoBehaviour
         State = PlayerState.Placing;
 
         _buildMenu.gameObject.SetActive(false);
+
+        if (!EconomyManager.Instance.TryPurchase(EconomyManager.Instance.GetBuildingMetadata((BuildingType)index)))
+        {
+            State = PlayerState.None;
+            return;
+        }
 
         GameObject prefab = EconomyManager.Instance.GetBuildingMetadata((BuildingType)index).Prefab;
 

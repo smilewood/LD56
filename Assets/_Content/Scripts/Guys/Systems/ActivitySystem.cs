@@ -92,7 +92,19 @@ public partial struct ActivitySystem : ISystem
                hauler.Hauling = false;
                animator.animationIndex = 5;
                //This is where we need to notify the game that the hauling is complete
-            }
+               switch (hauler.TypeBeingHauled)
+                    {
+                        case ResourceType.Bread:
+                            EconomyManager.Instance.Balance.Bread++;
+                            break;
+                        case ResourceType.Ore:
+                            EconomyManager.Instance.Balance.Ore++;
+                            break;
+                        case ResourceType.Biomass:
+                            EconomyManager.Instance.Balance.Biomass++;
+                            break;
+                    }
+                }
          }
       }
    }
