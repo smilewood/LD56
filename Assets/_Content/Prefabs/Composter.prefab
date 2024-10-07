@@ -258,6 +258,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2838405403738614679}
   - component: {fileID: 5806901510356227452}
+  - component: {fileID: 8293486606849528805}
   m_Layer: 0
   m_Name: Composter
   m_TagString: Untagged
@@ -313,3 +314,20 @@ MonoBehaviour:
     Biomass: 0
     Ore: 0
     Bread: 750
+--- !u!114 &8293486606849528805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6454332980243984289}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4ab307901563ad4c847fa0df64bf429, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WorkResultPrefab: {fileID: 2805725792245447040, guid: d47437b1fbe88a346b84ed65566a8bb5,
+    type: 3}
+  MaxWorking: 250
+  WorkDistance: 0
+  WorkTime: 10

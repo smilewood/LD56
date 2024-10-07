@@ -321,6 +321,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7267471123750180257}
   - component: {fileID: 1066608415688169161}
+  - component: {fileID: 5015405684615181756}
   m_Layer: 0
   m_Name: Fruit Tree
   m_TagString: Untagged
@@ -376,6 +377,21 @@ MonoBehaviour:
     Biomass: 0
     Ore: 0
     Bread: 500
+--- !u!114 &5015405684615181756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5581975287959866455}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9443dfdd2ce0ea4e986da71a6743e84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxFeeding: 100
+  FeedingDistance: 0
+  EatingTime: 1
 --- !u!1 &5664620297744819850
 GameObject:
   m_ObjectHideFlags: 0

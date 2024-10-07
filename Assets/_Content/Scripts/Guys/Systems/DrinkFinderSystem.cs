@@ -48,7 +48,7 @@ public partial struct DrinkFinderSystem : ISystem
             }
          }
 
-         float weight = -Mathf.Log(thirst.CurrentValue / thirst.MaxValue);
+         float weight = -(0.75f*(thirst.CurrentValue / thirst.MaxValue))+1;
 
          float bestTargetDist = math.INFINITY;
          Entity bestTarget = default;
