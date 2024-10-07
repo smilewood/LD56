@@ -5,12 +5,10 @@ using UnityEngine.Animations;
 
 public class InfoPopup : MonoBehaviour
 {
-    private Canvas _canvas;
+    [SerializeField] private Canvas _canvas;
 
     private void Awake()
     {
-        _canvas = GetComponentInChildren<Canvas>();
-
         LookAtConstraint constraint = _canvas.transform.GetComponent<LookAtConstraint>();
         constraint.AddSource(new ConstraintSource
         {
@@ -22,11 +20,11 @@ public class InfoPopup : MonoBehaviour
 
     public void Highlight()
     {
-
+        _canvas.gameObject.SetActive(true);
     }
 
     public void Unhighlight()
     {
-
+        _canvas.gameObject.SetActive(false);
     }
 }

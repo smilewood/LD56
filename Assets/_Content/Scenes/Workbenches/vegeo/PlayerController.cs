@@ -66,6 +66,10 @@ public class PlayerController : MonoBehaviour
 
         if (hoveredObject)
         {
+            if (_lastHovered != hoveredObject)
+            {
+                _highlighter.Unhighlight();
+            }
             _highlighter.Highlight(hoveredObject.transform);
             _lastHovered = hoveredObject;
         }
@@ -110,7 +114,7 @@ public class PlayerController : MonoBehaviour
 
         _previewMaterial.SetFloat("_Valid", _buildingPreview.ValidPlacement ? 1 : 0);
 
-        if (Mouse.current.leftButton.wasPressedThisFrame && Time.time - _timeStartedBuilding > 1f)
+        if (Mouse.current.leftButton.wasPressedThisFrame && Time.time - _timeStartedBuilding > 0.1f)
         {
             PlaceBuilding();
         }
