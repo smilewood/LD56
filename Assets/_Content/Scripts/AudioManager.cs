@@ -12,11 +12,23 @@ public enum Sound
    Place_Structure
 }
 
+public enum Voice
+{ 
+   Intro
+}
+
 [System.Serializable]
 public class SoundAudioClip
 { 
    public AudioClip AudioClip;
    public Sound sound;
+}
+
+[System.Serializable]
+public class VoiceAudioClip
+{
+   public AudioClip AudioClip;
+   public Voice Voice;
 }
 
 /// <summary>
@@ -31,24 +43,88 @@ public class AudioManager : MonoBehaviour
    private AudioSource soundsAudioSource;
 
    [SerializeField]
-   private AudioClip musicClip; // clip for music in this scene
+   private AudioSource ambienceAudioSource;
+
+   [SerializeField]
+   private AudioSource voiceAudioSource;
 
    [SerializeField]
    private List<SoundAudioClip> musicClipList;
 
+   [SerializeField]
+   private List<VoiceAudioClip> voiceClipList;
+
     // Start is called before the first frame update
     void Start()
     {
-      musicAudioSource.clip = musicClip;
-      musicAudioSource.Play();
       DontDestroyOnLoad(gameObject);
     }
+
+   public void PlayMusic()
+   {
+      musicAudioSource.Play();
+   }
+
+   public void StopMusic()
+   {
+      musicAudioSource.Stop();
+   }
+
+   public void PlayAmbience()
+   {
+      ambienceAudioSource.Play();
+   }
+
+   public void StopAmbience()
+   {
+      ambienceAudioSource.Stop();
+   }
+
+   /// <summary>
+   /// Plays the specified voice by locating a clip with the passed enum value
+   /// </summary>
+   /// <param name="voice">Voice to play</param>
+   public void PlayVoice(Voice voice)
+   {
+      if (!voiceClipList.Any(m => m.Voice == voice))
+      {
+         Debug.LogError("Voice is not in the audio list! " + voice.ToString());
+      }
+
+      var clips = voiceClipList.Where(m => m.Voice == voice);
+
+      AudioClip clip = null;
+
+      if (clips.Count() == 1)
+      {
+         clip = clips.First().AudioClip;
+      }
+      else
+      {
+         var quesadilla = Random.Range(0, clips.Count() - 1);
+
+         clip = clips.ElementAt(quesadilla).AudioClip;
+      }
+
+      voiceAudioSource.clip = clip;
+      voiceAudioSource.Play();
+   }
+
+   public void PlayIntroVoice()
+   {
+      PlayVoice(Voice.Intro);
+   }
+
+   public void StopPlayingVoice()
+   {
+      voiceAudioSource.Stop();
+   }
 
    /// <summary>
    /// Plays the specified sound by locating a clip with the passed enum value
    /// </summary>
    /// <param name="sound">Sound to play</param>
-    public void PlaySound(Sound sound)
+   public void PlaySound(Sound sound)
    {
       if (!musicClipList.Any(m => m.sound == sound))
       {

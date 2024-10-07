@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -14,7 +15,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform _previewParent;
     [SerializeField] private Material _previewMaterial;
     [SerializeField] private LayerMask _buildingRaycastMask;
+    [SerializeField] private LayerMask _interactionRaycastMask;
     [SerializeField] private float _buildingRotateAmount = 15f;
+    [Header("References")]
+    [SerializeField] private Highlighter _highlighter;
+    [SerializeField] private Button _capUpgrade;
+    [SerializeField] private Button _opRateUpgrade;
 
     private InputAction _rotateBuildingAction;
     private GameObject _currentBuilding;
@@ -22,6 +28,7 @@ public class PlayerController : MonoBehaviour
     private BuildingPreview _buildingPreview;
 
     private float _timeStartedBuilding;
+    private Transform _lastHovered;
 
     public PlayerState State { get; private set; }
 
@@ -53,18 +60,42 @@ public class PlayerController : MonoBehaviour
         _cameraController.AllowMouseInput = true;
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-        Physics.Raycast(ray, out hit);
+        Physics.Raycast(ray, out hit, 75f, _interactionRaycastMask);
 
-        Transform hoveredObject = hit.collider?.transform;
+        Transform hoveredObject = hit.collider?.transform.parent;
+
+        if (hoveredObject)
+        {
+            if (_lastHovered != hoveredObject)
+            {
+                _highlighter.Unhighlight();
+            }
+            _highlighter.Highlight(hoveredObject.transform);
+            _lastHovered = hoveredObject;
+        }
+        else
+        {
+            if (_lastHovered != null)
+            {
+                _highlighter.Unhighlight();
+                _lastHovered = null;
+            }
+        }
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            OpenContextMenu(hoveredObject);
+            OpenContextMenu(hoveredObject?.GetComponent<BuildingManager>());
         }
     }
 
     private void HandlePlacingState()
     {
+        if (_lastHovered != null)
+        {
+            _highlighter.Unhighlight();
+            _lastHovered = null;
+        }
+
         _cameraController.AllowMouseInput = false;
 
         RaycastHit hit;
@@ -83,7 +114,7 @@ public class PlayerController : MonoBehaviour
 
         _previewMaterial.SetFloat("_Valid", _buildingPreview.ValidPlacement ? 1 : 0);
 
-        if (Mouse.current.leftButton.wasPressedThisFrame && Time.time - _timeStartedBuilding > 1f)
+        if (Mouse.current.leftButton.wasPressedThisFrame && Time.time - _timeStartedBuilding > 0.1f)
         {
             PlaceBuilding();
         }
@@ -104,13 +135,46 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void OpenContextMenu(Transform hoveredObject)
+    private void OpenContextMenu(BuildingManager buildingManager)
     {
+        if (buildingManager != null)
+        {
+            _capUpgrade.gameObject.SetActive(!buildingManager.IsCapacityUpgraded);
+            _capUpgrade.interactable = buildingManager.CanUpgradeCapacity();
+            _opRateUpgrade.gameObject.SetActive(!buildingManager.IsOperationRateUpgraded);
+            _opRateUpgrade.interactable = buildingManager.CanUpgradeOperationRate();
+        }
+        else
+        {
+            _capUpgrade.gameObject.SetActive(false);
+            _opRateUpgrade.gameObject.SetActive(false);
+        }
+
         _contextMenu.gameObject.SetActive(true);
 
         _contextMenu.position = Mouse.current.position.ReadValue();
 
         State = PlayerState.UI;
+    }
+
+    public void AttemptCapUpgrade()
+    {
+        _contextMenu.gameObject.SetActive(false);
+        if (_lastHovered == null) return;
+        if (_lastHovered.TryGetComponent(out BuildingManager buildingManager))
+        {
+            buildingManager.TryUpgradeCapacity();
+        }
+    }
+
+    public void AttemptOpRateUpgrade()
+    {
+        _contextMenu.gameObject.SetActive(false);
+        if (_lastHovered == null) return;
+        if (_lastHovered.TryGetComponent(out BuildingManager buildingManager))
+        {
+            buildingManager.TryUpgradeOperationRate();
+        }
     }
 
     public void StartBuildingMenu()

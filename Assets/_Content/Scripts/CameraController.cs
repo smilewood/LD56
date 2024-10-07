@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
@@ -80,11 +81,15 @@ public class CameraController : MonoBehaviour
         }
         _focus.transform.eulerAngles += new Vector3(0, _rotateAction.ReadValue<float>() * KeyboardRotationSpeed * Time.deltaTime, 0);
 
-        Vector3 targetPosition = Vector3.Lerp(_lowPosition.position, _highPosition.position, _zoomValue);
-        _camera.transform.position = Vector3.Lerp(_camera.transform.position, targetPosition, _lerpingSpeed * Time.deltaTime);
+        _targetPosition = Vector3.Lerp(_lowPosition.position, _highPosition.position, _zoomValue);
 
         _closeDofVolume.weight = 1f - _zoomValue;
         _farDofVolume.weight = _zoomValue;
+    }
+
+    private void LateUpdate()
+    {
+        _camera.transform.position = Vector3.Lerp(_camera.transform.position, _targetPosition, _lerpingSpeed * Time.deltaTime);
     }
 
     private void FixedUpdate()

@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
@@ -9,6 +11,12 @@ using UnityEngine.UI;
 
 public class MenuFunctions : MonoBehaviour
 {
+   public GameObject myBoy;
+
+   public bool PlayIntro = true;
+   private bool IsIntroPlaying = false;
+   public AudioManager AudioManager;
+
    public Slider masterSlider;
    public Slider musicSlider;
    public Slider soundSlider;
@@ -33,6 +41,10 @@ public class MenuFunctions : MonoBehaviour
 
    private bool isquitting = false;
 
+   public GameObject TitleSplash;
+
+   public TextMeshProUGUI subtitle;
+
    private void Start()
    {
       DontDestroyOnLoad(gameObject);
@@ -56,6 +68,65 @@ public class MenuFunctions : MonoBehaviour
       _cancelAction.Enable();
       _openMenuAction = _input.FindAction("OpenMenu");
       _openMenuAction.Enable();
+
+      if (PlayIntro)
+      {
+         PlayIntroVoiceAndHideMenu();
+      }
+   }
+
+   public void PlayIntroVoiceAndHideMenu()
+   {
+      TitleSplash.SetActive(false);
+      IsIntroPlaying = true;
+      ShowMenu("Intro");
+      Cursor.visible = false;
+
+      StartCoroutine(IntroCoroutine());
+   }
+
+   private IEnumerator IntroCoroutine()
+   {
+      subtitle.text = "";
+
+      yield return new WaitForSeconds(3); //3
+
+      if (IsIntroPlaying)
+      {
+         AudioManager.PlayIntroVoice();
+         string subtitle1 = "Many centuries ago, right here in our little corner of Exaria, expert alchemists produced all of the technological and material products across the land. Using various minerals, plants, and machinery, alchemy was an early science of sorts, with thousands aiming to top the latest big discovery.";
+         subtitle.text = subtitle1;
+      }
+
+      yield return new WaitForSeconds(20); //23
+
+      if (IsIntroPlaying)
+      {
+         string subtitle2 = "One particular day, though, a young alchemist made the revolutionary discovery of Transmutation: creating short-lived, semi-intelligent elemental creatures using rather cheap alchemical processes. Their discovery shocked the entire alchemical world and brought us to the future we know today.";
+         subtitle.text = subtitle2;
+      }
+
+      yield return new WaitForSeconds(20); //43
+
+      if (IsIntroPlaying)
+      {
+         string subtitle3 = "It was so influential, in fact, that you may see and feel the turning point unfold with your own eyes using this Creature Box. Come, make yourself comfortable, and experience the legendary tale of Valenor the Wisp…";
+         subtitle.text = subtitle3;
+      }
+
+      yield return new WaitForSeconds(8); //51
+      if (IsIntroPlaying)
+      {
+         TitleSplash.SetActive(true);
+      }
+
+      yield return new WaitForSeconds(8); //59
+      if (IsIntroPlaying)
+      {
+         ShowMenu("MainMenu");
+         IsIntroPlaying = false;
+         Cursor.visible = true;
+      }
    }
 
    public void ExitGame()
@@ -152,29 +223,39 @@ public class MenuFunctions : MonoBehaviour
          InGameMenuIsOpen = true;
       }
 
-      Debug.Log("Opening Menu: " + menu);
-
       if (Menus.Any(m => m.name == menu))
       {
          Menus.Find(m => m.name == menu).SetActive(true);
-         Debug.Log("Success");
       }
    }
 
    void Update()
    {
-      AudioManager mgr = GameObject.FindGameObjectWithTag("AudioManager").GetComponent<AudioManager>();
-
-      if (CurrentSceneIsGameplay)
+      if (IsIntroPlaying)
       {
+         if (_openMenuAction.triggered)
+         {
+            ShowMenu("MainMenu");
+
+            AudioManager.StopPlayingVoice();
+            IsIntroPlaying = false;
+            Cursor.visible = true;
+         }
+      }
+      else if (CurrentSceneIsGameplay)
+      {
+         AudioManager.StopPlayingVoice();
+
          if (AnyMenuOpen)
          {
+            myBoy.SetActive(true);
+
             if (InGameMenuIsOpen)
             {
                if (_cancelAction.triggered)
                {
                   ShowMenu("None");
-                  mgr.PlayUICancel();
+                  AudioManager.PlayUICancel();
                }
             }
             else
@@ -182,15 +263,17 @@ public class MenuFunctions : MonoBehaviour
                if (_cancelAction.triggered)
                {
                   ShowMenu("InGameMenu");
-                  mgr.PlayUICancel();
+                  AudioManager.PlayUICancel();
                }
             }
          }
          else
          {
+            myBoy.SetActive(false);
+
             if (_openMenuAction.triggered)
             {
-               mgr.PlayUIInteract();
+               AudioManager.PlayUIInteract();
                ShowMenu("MainMenu");
             }
          }
@@ -201,7 +284,7 @@ public class MenuFunctions : MonoBehaviour
          {
             if (!MainMenuOpen && !CurrentSceneIsGameplay)
             {
-               mgr.PlayUICancel();
+               AudioManager.PlayUICancel();
             }
             ShowMenu("MainMenu");
          }
