@@ -109,7 +109,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   color: {r: 1, g: 1, b: 1, a: 1}
+  creatureIndex: 0
   animationIndex: 0
-  animationCount: 1
+  animationCount: 7
+  creatureCount: 3
   frameCount: 6
   fps: 12

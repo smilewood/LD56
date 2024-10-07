@@ -22,7 +22,11 @@ public class BuildingManager : MonoBehaviour
    void Start()
    {
         EconomyManager = EconomyManager.Instance;
-   }
+
+        BuildingSpawningManager.Instance.spawnPosition = transform.position;
+        BuildingSpawningManager.Instance.spawnRotation = transform.rotation;
+        BuildingSpawningManager.Instance.currentBuildingSpawnType = (BuildingSpawningManager.BuildingType)((int)BuildingType + 1);
+    }
 
    /// <summary>
    /// See if the capacity can be upgraded
