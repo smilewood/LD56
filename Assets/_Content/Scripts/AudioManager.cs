@@ -36,7 +36,9 @@ public class VoiceAudioClip
 /// </summary>
 public class AudioManager : MonoBehaviour
 {
-   [SerializeField]
+    public static AudioManager Instance;
+
+    [SerializeField]
    private AudioSource musicAudioSource;
 
    [SerializeField]
@@ -57,7 +59,15 @@ public class AudioManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-      DontDestroyOnLoad(gameObject);
+        if (Instance)
+        {
+
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
    public void PlayMusic()
