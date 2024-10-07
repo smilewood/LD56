@@ -51,6 +51,8 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
+
+        Physics.simulationMode = SimulationMode.FixedUpdate;
         if (Mouse.current.rightButton.wasPressedThisFrame)
         {
             _preservedCursorPosition = Mouse.current.position.ReadValue();
@@ -113,6 +115,8 @@ public class CameraController : MonoBehaviour
         {
             moveDirection -= Vector3.right;
         }
+
+        Debug.Log(moveDirection);
 
         moveDirection *= moveSpeed * Time.fixedDeltaTime;
 

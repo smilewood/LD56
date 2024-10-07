@@ -6,6 +6,9 @@ TagManager:
   tags:
   - EconomyManager
   - AudioManager
+  - Home
+  - Food
+  - Water
   layers:
   - Default
   - TransparentFX

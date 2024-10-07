@@ -1,3 +1,4 @@
+using Unity.Scenes;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -8,8 +9,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private InputActionAsset _inputActions;
     [SerializeField] private Transform _contextMenu;
     [SerializeField] private Transform _buildMenu;
+    [SerializeField] private Transform _creatureBuyMenu;
     [SerializeField] private GameObject _testPrefab;
     [SerializeField] private CameraController _cameraController;
+    [SerializeField] private GameObject[] _creaturePrefabs;
     [Header("Building Mode")]
     [SerializeField] private Transform _buildModeGroup;
     [SerializeField] private Transform _previewParent;
@@ -21,6 +24,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Highlighter _highlighter;
     [SerializeField] private Button _capUpgrade;
     [SerializeField] private Button _opRateUpgrade;
+    [SerializeField] private Button _deleteBuildingButton;
+    [SerializeField] private Button _creatureBuy;
+    [SerializeField] private SubScene _entityScene;
+    [SerializeField] private Transform _creatureSpawnLocation;
 
     private InputAction _rotateBuildingAction;
     private GameObject _currentBuilding;
@@ -62,7 +69,14 @@ public class PlayerController : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
         Physics.Raycast(ray, out hit, 75f, _interactionRaycastMask);
 
-        Transform hoveredObject = hit.collider?.transform.parent;
+        Transform hoveredObject = null;
+        if (hit.collider != null)
+        {
+            if (hit.collider.transform.parent != null)
+                hoveredObject = hit.collider.transform.parent;
+            else
+                hoveredObject = hit.collider.transform;
+        }
 
         if (hoveredObject)
         {
@@ -84,7 +98,14 @@ public class PlayerController : MonoBehaviour
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            OpenContextMenu(hoveredObject?.GetComponent<BuildingManager>());
+            if (hoveredObject == null)
+            {
+                OpenContextMenuNoContext();
+            }
+            else
+            {
+                OpenContextMenu(hoveredObject);
+            }
         }
     }
 
@@ -131,23 +152,59 @@ public class PlayerController : MonoBehaviour
         {
             _contextMenu.gameObject.SetActive(false);
             _buildMenu.gameObject.SetActive(false);
+            _creatureBuyMenu.gameObject.SetActive(false);
             State = PlayerState.None;
         }
     }
 
-    private void OpenContextMenu(BuildingManager buildingManager)
+    private void OpenContextMenuNoContext()
     {
+        _capUpgrade.gameObject.SetActive(false);
+        _opRateUpgrade.gameObject.SetActive(false);
+        _creatureBuy.gameObject.SetActive(false);
+        _deleteBuildingButton.gameObject.SetActive(false);
+
+        _contextMenu.position = Mouse.current.position.ReadValue();
+
+        State = PlayerState.UI;
+
+        _contextMenu.gameObject.SetActive(true);
+    }
+
+    private void OpenContextMenu(Transform hoveredObject)
+    {
+        BuildingManager buildingManager = hoveredObject?.GetComponent<BuildingManager>();
         if (buildingManager != null)
         {
             _capUpgrade.gameObject.SetActive(!buildingManager.IsCapacityUpgraded);
             _capUpgrade.interactable = buildingManager.CanUpgradeCapacity();
             _opRateUpgrade.gameObject.SetActive(!buildingManager.IsOperationRateUpgraded);
             _opRateUpgrade.interactable = buildingManager.CanUpgradeOperationRate();
+            _deleteBuildingButton.gameObject.SetActive(true);
         }
         else
         {
             _capUpgrade.gameObject.SetActive(false);
             _opRateUpgrade.gameObject.SetActive(false);
+            _creatureBuy.gameObject.SetActive(false);
+        }
+
+        bool canBuyCreatures = false;
+
+        // Check if food and water tags exist in scene
+        if (GameObject.FindGameObjectsWithTag("Food").Length > 0 && GameObject.FindGameObjectsWithTag("Water").Length > 0)
+        {
+            canBuyCreatures = true;
+        }
+
+        if (hoveredObject.tag == "Home")
+        {
+            _creatureBuy.gameObject.SetActive(true);
+            _creatureBuy.interactable = canBuyCreatures;
+        }
+        else
+        {
+            _creatureBuy.gameObject.SetActive(false);
         }
 
         _contextMenu.gameObject.SetActive(true);
@@ -185,6 +242,32 @@ public class PlayerController : MonoBehaviour
         _buildMenu.position = Mouse.current.position.ReadValue();
 
         State = PlayerState.UI;
+    }
+
+    public void StartCreatureBuyMenu()
+    {
+        _contextMenu.gameObject.SetActive(false);
+        _creatureBuyMenu.gameObject.SetActive(true);
+
+        _creatureBuyMenu.position = Mouse.current.position.ReadValue();
+
+        State = PlayerState.UI;
+    }
+
+    public void BuyCreature(int index)
+    {
+        switch (index)
+        {
+            case 0:
+                CreatureSpawnManager.Instance.CleanerCount++;
+                break;
+            case 1:
+                CreatureSpawnManager.Instance.HaulerCount++;
+                break;
+            case 2:
+                CreatureSpawnManager.Instance.ProducerCount++;
+                break;
+        }
     }
 
     public void StartBuildingPlacement(int index)
