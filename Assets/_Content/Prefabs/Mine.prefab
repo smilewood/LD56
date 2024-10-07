@@ -205,6 +205,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8804639793524763559}
   - component: {fileID: 2858075568064420819}
+  - component: {fileID: 2499113789181035380}
   m_Layer: 0
   m_Name: Mine
   m_TagString: Untagged
@@ -260,6 +261,23 @@ MonoBehaviour:
     Biomass: 0
     Ore: 0
     Bread: 750
+--- !u!114 &2499113789181035380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4851531501724965281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4ab307901563ad4c847fa0df64bf429, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WorkResultPrefab: {fileID: 2805725792245447040, guid: 5f971314dc0bc8043a57894e80840019,
+    type: 3}
+  MaxWorking: 250
+  WorkDistance: 0
+  WorkTime: 10
 --- !u!1 &7463217433893630256
 GameObject:
   m_ObjectHideFlags: 0

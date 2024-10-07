@@ -352,6 +352,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2143350321281036115}
   - component: {fileID: 2673412190415796067}
+  - component: {fileID: 7589813610822469130}
   m_Layer: 0
   m_Name: Well
   m_TagString: Untagged
@@ -407,3 +408,18 @@ MonoBehaviour:
     Biomass: 0
     Ore: 0
     Bread: 500
+--- !u!114 &7589813610822469130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7986364916392778829}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 425c89bab1016fb4988d8599a84c753b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxDrinking: 100
+  DrinkDistance: 0
+  drinkTime: 1
