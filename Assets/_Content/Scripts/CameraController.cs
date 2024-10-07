@@ -116,7 +116,7 @@ public class CameraController : MonoBehaviour
             moveDirection -= Vector3.right;
         }
 
-        Debug.Log(moveDirection);
+        //sDebug.Log(moveDirection);
 
         moveDirection *= moveSpeed * Time.fixedDeltaTime;
 

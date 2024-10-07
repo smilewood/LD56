@@ -49,102 +49,114 @@ public partial struct MovmentToDestinationSystem : ISystem
       [ReadOnly]
       public ComponentLookup<DestinationCapicityData> capicity;
 
-      private void Execute([ChunkIndexInQuery] int chunkIndex, 
-         in MoveSpeedData moveSpeed, 
-         ref CurrentDestinationData destination, 
+      private void Execute([ChunkIndexInQuery] int chunkIndex,
+         in MoveSpeedData moveSpeed,
+         ref CurrentDestinationData destination,
          ref LocalToWorld world,
          ref PhysicsVelocity physicsVelocity,
          ref SpriteSheetAnimation animator,
          ref BigBrainData brain,
          Entity target)
       {
-         DestinationCapicityData destCapicity = capicity[destination.destination];
-         if (math.distance(world.Position, destination.destinationLocation) < destination.ApproachRadius)
+         if (capicity.EntityExists(destination.destination))
          {
-            Ecb.RemoveComponent<CurrentDestinationData>(chunkIndex, target);
-            if (foodStations.TryGetComponent(destination.destination, out FoodStationData foodStation))
+
+            DestinationCapicityData destCapicity = capicity[destination.destination];
+
+
+
+            if (destCapicity.OpenSlots <= 0 || brain.ReconsiderTimer <= 0)
             {
-               Ecb.AddComponent(chunkIndex, target, new ActivityData
-               {
-                  remainingTime = foodStation.EatingTime,
-                  reservedSpot = destCapicity,
-                  Activity = ActivityType.Eat,
-                  Location = destination.destinationLocation
-               });
-               animator.animationIndex = 5;
+               Ecb.RemoveComponent<CurrentDestinationData>(chunkIndex, target);
+               animator.animationIndex = 6;
             }
-            else if (drinkStations.TryGetComponent(destination.destination, out DrinkStationData drinkStation))
+            else if (math.distance(world.Position, destination.destinationLocation) < destination.ApproachRadius)
             {
-               Ecb.AddComponent(chunkIndex, target, new ActivityData
+               Ecb.RemoveComponent<CurrentDestinationData>(chunkIndex, target);
+               if (foodStations.TryGetComponent(destination.destination, out FoodStationData foodStation))
                {
-                  remainingTime = drinkStation.DrinkTime,
-                  reservedSpot = destCapicity,
-                  Activity = ActivityType.Drink,
-                  Location = destination.destinationLocation
-               });
-               animator.animationIndex = 5;
-            }
-            else if (workStations.TryGetComponent(destination.destination, out WorkStationData workStation))
-            {
-               Ecb.AddComponent(chunkIndex, target, new ActivityData
+                  Ecb.AddComponent(chunkIndex, target, new ActivityData
+                  {
+                     remainingTime = foodStation.EatingTime,
+                     reservedSpot = destCapicity,
+                     Activity = ActivityType.Eat,
+                     Location = destination.destinationLocation
+                  });
+                  animator.animationIndex = 5;
+               }
+               else if (drinkStations.TryGetComponent(destination.destination, out DrinkStationData drinkStation))
                {
-                  remainingTime = workStation.WorkTime,
-                  reservedSpot = destCapicity,
-                  Activity = ActivityType.Produce,
-                  ActivityTarget = workStation.WorkResultPrefab,
-                  Location = destination.destinationLocation
-               });
-               animator.animationIndex = 3;
-            }
-            else if (haulableStuff.TryGetComponent(destination.destination, out HaulableData data))
-            {
-               Ecb.AddComponent(chunkIndex, target, new ActivityData
+                  Ecb.AddComponent(chunkIndex, target, new ActivityData
+                  {
+                     remainingTime = drinkStation.DrinkTime,
+                     reservedSpot = destCapicity,
+                     Activity = ActivityType.Drink,
+                     Location = destination.destinationLocation
+                  });
+                  animator.animationIndex = 5;
+               }
+               else if (workStations.TryGetComponent(destination.destination, out WorkStationData workStation))
                {
-                  remainingTime = 0.1f,
-                  Activity = ActivityType.PickUp,
-                  ActivityTarget = destination.destination,
-                  Location = destination.destinationLocation,
-                  reservedSpot = destCapicity
-               });
-               animator.animationIndex = 4;
-            }
-            else if(dropStations.TryGetComponent(destination.destination, out DropPointData dropPoint))
-            {
-               Ecb.AddComponent(chunkIndex, target, new ActivityData
+                  Ecb.AddComponent(chunkIndex, target, new ActivityData
+                  {
+                     remainingTime = workStation.WorkTime,
+                     reservedSpot = destCapicity,
+                     Activity = ActivityType.Produce,
+                     ActivityTarget = workStation.WorkResultPrefab,
+                     Location = destination.destinationLocation
+                  });
+                  animator.animationIndex = 3;
+               }
+               else if (haulableStuff.TryGetComponent(destination.destination, out HaulableData data))
                {
-                  remainingTime = 0.1f,
-                  Activity = ActivityType.DropOff,
-                  ActivityTarget = destination.destination,
-                  Location = destination.destinationLocation
-               });
-            }
-            else if (cleanupSpots.TryGetComponent(destination.destination, out CleaningSpotData cleanSpot))
-            {
-               Ecb.AddComponent(chunkIndex, target, new ActivityData
+                  Ecb.AddComponent(chunkIndex, target, new ActivityData
+                  {
+                     remainingTime = 0.5f,
+                     Activity = ActivityType.PickUp,
+                     ActivityTarget = destination.destination,
+                     Location = destination.destinationLocation,
+                     reservedSpot = destCapicity
+                  });
+                  animator.animationIndex = 4;
+               }
+               else if (dropStations.TryGetComponent(destination.destination, out DropPointData dropPoint))
                {
-                  remainingTime = cleanSpot.CleaningTime,
-                  Activity = ActivityType.Clean,
-                  ActivityTarget = destination.destination,
-                  Location = destination.destinationLocation,
-                  reservedSpot = destCapicity
-               });
+                  Ecb.AddComponent(chunkIndex, target, new ActivityData
+                  {
+                     remainingTime = 0.5f,
+                     Activity = ActivityType.DropOff,
+                     ActivityTarget = destination.destination,
+                     Location = destination.destinationLocation
+                  });
+               }
+               else if (cleanupSpots.TryGetComponent(destination.destination, out CleaningSpotData cleanSpot))
+               {
+                  Ecb.AddComponent(chunkIndex, target, new ActivityData
+                  {
+                     remainingTime = cleanSpot.CleaningTime,
+                     Activity = ActivityType.Clean,
+                     ActivityTarget = destination.destination,
+                     Location = destination.destinationLocation,
+                     reservedSpot = destCapicity
+                  });
+               }
+               else
+               {
+                  Debug.LogError("We got somewhere without a work type");
+               }
+               //physicsVelocity.Linear = 0;
             }
             else
             {
-               Debug.LogError("We got somewhere without a work type");
+               float3 targetvelocity = math.normalizesafe(destination.destinationLocation - world.Position);
+               targetvelocity.y = .3f;
+               physicsVelocity.Linear += deltaTime * moveSpeed.MoveSpeed * targetvelocity;
             }
-            //physicsVelocity.Linear = 0;
-         }
-         else if(destCapicity.OpenSlots <= 0 || brain.ReconsiderTimer <= 0)
-         {
-            Ecb.RemoveComponent<CurrentDestinationData>(chunkIndex, target);
-            animator.animationIndex = 6;
          }
          else
          {
-            float3 targetvelocity = math.normalizesafe(destination.destinationLocation - world.Position);
-            targetvelocity.y = .3f;
-            physicsVelocity.Linear += deltaTime * moveSpeed.MoveSpeed * targetvelocity;
+            Ecb.RemoveComponent<CurrentDestinationData>(chunkIndex, target);
+            animator.animationIndex = 6;
          }
       }
    }
