@@ -175,6 +175,7 @@ public class PlayerController : MonoBehaviour
 
     private void OpenContextMenu(Transform hoveredObject)
     {
+        /*
         BuildingManager buildingManager = hoveredObject?.GetComponent<BuildingManager>();
         if (buildingManager != null)
         {
@@ -190,6 +191,7 @@ public class PlayerController : MonoBehaviour
             _opRateUpgrade.gameObject.SetActive(false);
             _creatureBuy.gameObject.SetActive(false);
         }
+        */
 
         bool canBuyCreatures = false;
 
@@ -218,6 +220,7 @@ public class PlayerController : MonoBehaviour
 
     public void AttemptCapUpgrade()
     {
+        AudioManager.Instance.PlayUIInteract();
         _contextMenu.gameObject.SetActive(false);
         if (_lastHovered == null) return;
         if (_lastHovered.TryGetComponent(out BuildingManager buildingManager))
@@ -228,6 +231,7 @@ public class PlayerController : MonoBehaviour
 
     public void AttemptOpRateUpgrade()
     {
+        AudioManager.Instance.PlayUIInteract();
         _contextMenu.gameObject.SetActive(false);
         if (_lastHovered == null) return;
         if (_lastHovered.TryGetComponent(out BuildingManager buildingManager))
@@ -238,6 +242,7 @@ public class PlayerController : MonoBehaviour
 
     public void StartBuildingMenu()
     {
+        AudioManager.Instance.PlayUIInteract();
         for (int i = 0; i < _buildingBuysButtons.Length; i++)
         {
             _buildingBuysButtons[i].interactable = EconomyManager.Instance.CanPurchase(EconomyManager.Instance.GetBuildingMetadata((BuildingType)i));
@@ -253,6 +258,7 @@ public class PlayerController : MonoBehaviour
 
     public void StartCreatureBuyMenu()
     {
+        AudioManager.Instance.PlayUIInteract();
         RefreshCreatureBuyMenuInteractable();
         _contextMenu.gameObject.SetActive(false);
         _creatureBuyMenu.gameObject.SetActive(true);
@@ -271,6 +277,9 @@ public class PlayerController : MonoBehaviour
 
     public void BuyCreature(int index)
     {
+        AudioManager.Instance.PlayUIInteract();
+        AudioManager.Instance.PlayTransmutiteCall();
+
         switch (index)
         {
             case 0:
@@ -290,6 +299,7 @@ public class PlayerController : MonoBehaviour
 
     public void StartBuildingPlacement(int index)
     {
+        AudioManager.Instance.PlayUIInteract();
         State = PlayerState.Placing;
 
         _buildMenu.gameObject.SetActive(false);
@@ -333,6 +343,8 @@ public class PlayerController : MonoBehaviour
     {
         if (State != PlayerState.Placing) return;
         if (!_buildingPreview.ValidPlacement) return;
+
+        AudioManager.Instance.PlayPlaceStructure();
 
         State = PlayerState.None;
 
