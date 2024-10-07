@@ -41,7 +41,7 @@ public class ModifierComponent : MonoBehaviour
    {
       public override void Bake(ModifierComponent authoring)
       {
-         Entity target = GetEntity(TransformUsageFlags.None);
+         Entity target = GetEntity(TransformUsageFlags.Dynamic);
          AddComponent(target, new CanHaveModifiers { });
          AddBuffer<ModifierData>(target);
          if (authoring.baselines != null)

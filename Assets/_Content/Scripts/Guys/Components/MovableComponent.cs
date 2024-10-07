@@ -21,7 +21,7 @@ public class MovableBaker : Baker<MovableComponent>
 {
    public override void Bake(MovableComponent authoring)
    {
-      Entity myEntitiy = GetEntity(TransformUsageFlags.None);
+      Entity myEntitiy = GetEntity(TransformUsageFlags.Dynamic);
 
       AddComponent(myEntitiy, new MovableData
       {

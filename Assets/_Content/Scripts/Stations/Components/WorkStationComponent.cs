@@ -29,7 +29,7 @@ public class WorkStationBaker : Baker<WorkStationComponent>
       {
          WorkDistance = authoring.WorkDistance,
          WorkTime = authoring.WorkTime,
-         WorkResultPrefab = GetEntity(authoring.WorkResultPrefab, TransformUsageFlags.None)
+         WorkResultPrefab = GetEntity(authoring.WorkResultPrefab, TransformUsageFlags.Dynamic)
       });
 
       AddComponent(target, new DestinationCapicityData

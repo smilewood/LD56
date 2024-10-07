@@ -41,7 +41,6 @@ public partial struct ModifierDrainSystem : ISystem
             var modifier = initialBuffer[i];
             if ((modifier.CurrentValue / modifier.MaxValue) < ReproduceThreshold)
             {
-               Debug.Log($"{modifier.ModType.ToString()} is under the reproduction threshold");
                brain.ReproduceTimer = brain.ReproduceCooldown;
                return;
             }

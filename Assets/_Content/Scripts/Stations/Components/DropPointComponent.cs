@@ -15,7 +15,7 @@ public class DropPointComponent : MonoBehaviour
    {
       public override void Bake(DropPointComponent authoring)
       {
-         Entity target = GetEntity(TransformUsageFlags.None);
+         Entity target = GetEntity(TransformUsageFlags.Dynamic);
 
          AddComponent(target, new DropPointData { });
          AddComponent(target, new DestinationCapicityData { destEntity = target, MaxOccupency = 999999 });

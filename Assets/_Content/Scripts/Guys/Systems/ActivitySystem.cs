@@ -17,15 +17,16 @@ public partial struct ActivitySystem : ISystem
    {
       EntityCommandBuffer.ParallelWriter ecb = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>().CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
 
-      new ProcessActivityTimer { deltaTime = SystemAPI.Time.DeltaTime, Ecb = ecb }.ScheduleParallel();
-      new ProcessActivityChanges { deltaTime = SystemAPI.Time.DeltaTime }.ScheduleParallel();
+      var timerUpdate = new ProcessActivityTimer { deltaTime = SystemAPI.Time.DeltaTime, Ecb = ecb }.ScheduleParallel(state.Dependency);
+      
+      var changes = new ProcessActivityChanges { deltaTime = SystemAPI.Time.DeltaTime }.ScheduleParallel(timerUpdate);
 
-      new ProcessProducerActivity { Ecb = ecb }.ScheduleParallel();
-      new ProcessHaulerActivity { Ecb = ecb, haulableStuff = SystemAPI.GetComponentLookup<HaulableData>() }.ScheduleParallel();
-      new ProcessCleanerActivity { Ecb = ecb }.ScheduleParallel();
+      var prod = new ProcessProducerActivity { Ecb = ecb }.ScheduleParallel(changes);
+      var haul = new ProcessHaulerActivity { Ecb = ecb, haulableStuff = SystemAPI.GetComponentLookup<HaulableData>() }.ScheduleParallel(prod);
+      var clean = new ProcessCleanerActivity { Ecb = ecb }.ScheduleParallel(haul);
 
-      new MoveToActivityJob { deltaTime = SystemAPI.Time.DeltaTime }.ScheduleParallel();
-
+      var move = new MoveToActivityJob { deltaTime = SystemAPI.Time.DeltaTime }.ScheduleParallel(clean);
+      state.Dependency = move;
    }
 
    [BurstCompile]
@@ -70,7 +71,7 @@ public partial struct ActivitySystem : ISystem
       [ReadOnly]
       public ComponentLookup<HaulableData> haulableStuff;
 
-      private void Execute([ChunkIndexInQuery] int chunkIndex, ref HaulerStateData hauler, ref ActivityData activity, ref SpriteSheetAnimation animator, Entity target)
+      private void Execute([ChunkIndexInQuery] int chunkIndex, ref HaulerStateData hauler, in ActivityData activity, ref SpriteSheetAnimation animator, Entity target)
       {
          if (activity.remainingTime <= 0)
          {
@@ -119,15 +120,12 @@ public partial struct ActivitySystem : ISystem
    {
       public EntityCommandBuffer.ParallelWriter Ecb;
       public float deltaTime;
-      private void Execute([ChunkIndexInQuery] int chunkIndex, ref ActivityData activity, ref SpriteSheetAnimation animator, Entity target)
+      private void Execute([ChunkIndexInQuery] int chunkIndex, ref ActivityData activity, Entity target)
       {
-         if(activity.remainingTime < 0)
+         activity.remainingTime -= deltaTime;
+         if(activity.remainingTime <= 0)
          {
             Ecb.RemoveComponent<ActivityData>(chunkIndex, target);
-         }
-         else
-         {
-            activity.remainingTime -= deltaTime;
          }
       }
    }
@@ -139,7 +137,7 @@ public partial struct ActivitySystem : ISystem
    public partial struct ProcessActivityChanges : IJobEntity
    {
       public float deltaTime;
-      private void Execute(DynamicBuffer<ModifierData> modBuffer, ref ActivityData activity)
+      private void Execute(DynamicBuffer<ModifierData> modBuffer, in ActivityData activity)
       {
          switch (activity.Activity)
          {
