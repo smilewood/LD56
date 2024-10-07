@@ -18,6 +18,7 @@ public class DropPointComponent : MonoBehaviour
          Entity target = GetEntity(TransformUsageFlags.None);
 
          AddComponent(target, new DropPointData { });
+         AddComponent(target, new DestinationCapicityData { destEntity = target, MaxOccupency = 999999 });
       }
    }
 }

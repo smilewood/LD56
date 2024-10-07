@@ -42,7 +42,7 @@ public class WorkerTypeComponent : MonoBehaviour
                AddComponent(target, new HaulerStateData { });
             break;
             case WorkerType.Cleaner:
-            AddComponent(target, new CleanerStateData { });
+               AddComponent(target, new CleanerStateData { });
             break;
          }
       }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Entities;
+using Unity.Transforms;
 using UnityEngine;
 
 public partial struct MakeAMessSystem : ISystem
@@ -22,7 +23,7 @@ public partial struct MakeAMessSystem : ISystem
       public float deltaTime;
       public EntityCommandBuffer.ParallelWriter Ecb;
 
-      private void Execute([ChunkIndexInQuery] int chunkIndex, ref MakesAMessData mess)
+      private void Execute([ChunkIndexInQuery] int chunkIndex, ref MakesAMessData mess, in LocalToWorld transform)
       {
          if(mess.RemainingTime > 0)
          {
@@ -31,7 +32,8 @@ public partial struct MakeAMessSystem : ISystem
          else
          {
             mess.RemainingTime = mess.BaseTime;
-            Ecb.Instantiate(chunkIndex, mess.MessEntity);
+            Entity poop = Ecb.Instantiate(chunkIndex, mess.MessEntity);
+            Ecb.SetComponent(chunkIndex, poop, LocalTransform.FromPositionRotationScale(transform.Position, Quaternion.identity, .1f));
          }
       }
    }

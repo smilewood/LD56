@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 4841774699151324177}
   - component: {fileID: 3208743720891388766}
   m_Layer: 12
-  m_Name: Producer
+  m_Name: Cleaner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -58,8 +58,8 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.2
-  m_Height: 0.5
+  m_Radius: 0.1
+  m_Height: 0.25
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &7392269470689850995
@@ -101,7 +101,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e03fdf4cd2e3c094db6430b4f0170edd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 12
+  speed: 15
 --- !u!114 &2096085130030902216
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -128,11 +128,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baselines:
   - ModType: 0
-    startValue: 5
-    naturalDecayRate: 0.1
+    startValue: 8
+    naturalDecayRate: 0.06
   - ModType: 1
-    startValue: 5
-    naturalDecayRate: 0.1
+    startValue: 8
+    naturalDecayRate: 0.12
   - ModType: 2
     startValue: 5
     naturalDecayRate: -0.03
@@ -148,7 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6abd1a1f6c4064e4481ceb2a4c7fbe2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TypeOfWorker: 0
+  TypeOfWorker: 2
 --- !u!114 &4841774699151324177
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -162,7 +162,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   color: {r: 1, g: 1, b: 1, a: 1}
-  creatureIndex: 2
+  creatureIndex: 1
   animationIndex: 7
   animationCount: 7
   creatureCount: 3

@@ -21,7 +21,7 @@ public partial struct ActivitySystem : ISystem
       new ProcessActivityChanges { deltaTime = SystemAPI.Time.DeltaTime }.ScheduleParallel();
 
       new ProcessProducerActivity { Ecb = ecb }.ScheduleParallel();
-      new ProcessHaulerActivity { Ecb = ecb }.ScheduleParallel();
+      new ProcessHaulerActivity { Ecb = ecb, haulableStuff = SystemAPI.GetComponentLookup<HaulableData>() }.ScheduleParallel();
       new ProcessCleanerActivity { Ecb = ecb }.ScheduleParallel();
 
       new MoveToActivityJob { deltaTime = SystemAPI.Time.DeltaTime }.ScheduleParallel();
@@ -52,12 +52,13 @@ public partial struct ActivitySystem : ISystem
    {
       public EntityCommandBuffer.ParallelWriter Ecb;
 
-      private void Execute([ChunkIndexInQuery] int chunkIndex, in ProducerStateData _, in ActivityData activity, ref SpriteSheetAnimation animator)
+      private void Execute([ChunkIndexInQuery] int chunkIndex, in ProducerStateData _, in ActivityData activity, ref SpriteSheetAnimation animator, in LocalToWorld transform)
       {
-         if(activity.remainingTime <= 0)
+         if(activity.remainingTime <= 0 && activity.Activity == ActivityType.Produce)
          {
             animator.animationIndex = 5;
-            Ecb.Instantiate(chunkIndex, activity.ActivityTarget);
+            Entity result = Ecb.Instantiate(chunkIndex, activity.ActivityTarget);
+            Ecb.SetComponent(chunkIndex, result, LocalTransform.FromPositionRotationScale(transform.Position, Quaternion.identity, .1f));
          }
       }
    }
@@ -66,21 +67,28 @@ public partial struct ActivitySystem : ISystem
    public partial struct ProcessHaulerActivity : IJobEntity
    {
       public EntityCommandBuffer.ParallelWriter Ecb;
+      [ReadOnly]
+      public ComponentLookup<HaulableData> haulableStuff;
 
-      private void Execute([ChunkIndexInQuery] int chunkIndex, ref HaulerStateData hauler, in ActivityData activity, ref SpriteSheetAnimation animator, Entity target)
+      private void Execute([ChunkIndexInQuery] int chunkIndex, ref HaulerStateData hauler, ref ActivityData activity, ref SpriteSheetAnimation animator, Entity target)
       {
          if (activity.remainingTime <= 0)
          {
-            if (!hauler.Hauling)
+            if (activity.Activity == ActivityType.PickUp)
             {
-               animator.animationIndex = 3;
                hauler.Hauling = true;
-               Ecb.DestroyEntity(chunkIndex, activity.ActivityTarget);
+               hauler.TypeBeingHauled = haulableStuff[activity.ActivityTarget].Type;
+               if (haulableStuff.EntityExists(activity.ActivityTarget))
+               {
+                  Ecb.DestroyEntity(chunkIndex, activity.ActivityTarget);
+               }
+               
+               animator.animationIndex = 3;
             }
-            else
+            else if(activity.Activity == ActivityType.DropOff)
             {
-               animator.animationIndex = 5;
                hauler.Hauling = false;
+               animator.animationIndex = 5;
                //This is where we need to notify the game that the hauling is complete
             }
          }
@@ -94,10 +102,14 @@ public partial struct ActivitySystem : ISystem
 
       private void Execute([ChunkIndexInQuery] int chunkIndex, in CleanerStateData _, in ActivityData activity, ref SpriteSheetAnimation animator)
       {
-         if (activity.remainingTime <= 0)
+         if (activity.Activity == ActivityType.Clean)
          {
-            animator.animationIndex = 5;
-            Ecb.DestroyEntity(chunkIndex, activity.ActivityTarget);
+            animator.animationIndex = 3;
+            if (activity.remainingTime <= 0)
+            {
+               animator.animationIndex = 5;
+               Ecb.DestroyEntity(chunkIndex, activity.ActivityTarget);
+            }
          }
       }
    }

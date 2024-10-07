@@ -24,6 +24,7 @@ public class HaulableComponent : MonoBehaviour
          Entity target = GetEntity(TransformUsageFlags.Dynamic);
 
          AddComponent(target, new HaulableData { Type = authoring.ResourceType });
+         AddComponent(target, new DestinationCapicityData { destEntity = target, MaxOccupency = 1 });
       }
    }
 }

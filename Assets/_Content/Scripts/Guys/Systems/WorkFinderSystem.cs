@@ -38,7 +38,7 @@ public partial struct WorkFinderSystem : ISystem
       }.ScheduleParallel();
 
       EntityQuery cleanPointsQuery = SystemAPI.QueryBuilder().WithAll<CleaningSpotData>().Build();
-      NativeArray<Entity> cleanPoints = dropPointsQuery.ToEntityArray(state.WorldUnmanaged.UpdateAllocator.Handle);
+      NativeArray<Entity> cleanPoints = cleanPointsQuery.ToEntityArray(state.WorldUnmanaged.UpdateAllocator.Handle);
 
       new ProcessCleanerWorkSearch
       {

@@ -87,7 +87,7 @@ public partial struct BigBrainSystem : ISystem
                destinationLocation = locations[maxTarget].Position,
                ApproachRadius = approach
             });
-            animator.animationIndex = 7;
+            animator.animationIndex = 4;
             brain.ReconsiderTimer = 15;
          }
       }
