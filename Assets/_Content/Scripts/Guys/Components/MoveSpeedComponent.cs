@@ -18,7 +18,7 @@ public class MoveSpeedBaker : Baker<MoveSpeedComponent>
       Entity target = GetEntity(TransformUsageFlags.None);
       AddComponent(target, new MoveSpeedData
       {
-         MoveSpeed = authoring.speed,
+         MoveSpeed = authoring.speed + Random.Range(-.5f, .5f),
          MoveMult = 1
       });
    }

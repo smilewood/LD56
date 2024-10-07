@@ -25,6 +25,12 @@ public struct CurrentDestinationData : IComponentData
    public float3 destinationLocation;
 }
 
+public struct BigBrainData : IComponentData
+{
+   public float ReconsiderTimer;
+}
+
+
 public class BigBrainComponent : MonoBehaviour
 {
 
@@ -35,7 +41,7 @@ public class BigBrainBaker : Baker<BigBrainComponent>
    public override void Bake(BigBrainComponent authoring)
    {
       Entity target = GetEntity(TransformUsageFlags.None);
-      
+      AddComponent(target, new BigBrainData { ReconsiderTimer = 30 });
       AddComponent(target, new DestinationDesireData { });
    }
 }

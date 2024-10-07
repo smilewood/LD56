@@ -9,6 +9,7 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -84,7 +85,7 @@ public partial struct FoodFinderSystem : ISystem
             }
          }
 
-         float weight = -Mathf.Log(hunger.CurrentValue / hunger.MaxValue);
+         float weight = -(0.75f * (hunger.CurrentValue / hunger.MaxValue)) + 1;
 
          float bestTargetDist = math.INFINITY;
          Entity bestTarget = default;

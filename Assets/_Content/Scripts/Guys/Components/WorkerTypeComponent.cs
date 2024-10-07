@@ -9,10 +9,20 @@ public enum WorkerType
    Producer, Hauler, Cleaner
 }
 
-public struct WorkerTypeData : IComponentData
+public struct ProducerStateData : IComponentData
 {
-   public WorkerType WorkerType;
 }
+
+public struct HaulerStateData : IComponentData
+{
+   public bool Hauling;
+   public ResourceType TypeBeingHauled;
+}
+
+public struct CleanerStateData : IComponentData
+{
+}
+
 
 public class WorkerTypeComponent : MonoBehaviour
 {
@@ -23,7 +33,18 @@ public class WorkerTypeComponent : MonoBehaviour
       public override void Bake(WorkerTypeComponent authoring)
       {
          Entity target = GetEntity(TransformUsageFlags.Dynamic);
-         AddComponent(target, new WorkerTypeData { WorkerType = authoring.TypeOfWorker });
+         switch (authoring.TypeOfWorker)
+         {
+            case WorkerType.Producer:
+               AddComponent(target, new ProducerStateData { });
+            break;
+            case WorkerType.Hauler:
+               AddComponent(target, new HaulerStateData { });
+            break;
+            case WorkerType.Cleaner:
+               AddComponent(target, new CleanerStateData { });
+            break;
+         }
       }
    }
 }
