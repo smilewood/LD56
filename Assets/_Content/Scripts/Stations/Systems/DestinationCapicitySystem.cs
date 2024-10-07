@@ -5,6 +5,8 @@ using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 
+
+[UpdateInGroup(typeof(LateSimulationSystemGroup))]
 public partial struct DestinationCapicitySystem : ISystem
 {
 
