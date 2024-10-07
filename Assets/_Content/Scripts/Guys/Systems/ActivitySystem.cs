@@ -20,13 +20,14 @@ public partial struct ActivitySystem : ISystem
       var timerUpdate = new ProcessActivityTimer { deltaTime = SystemAPI.Time.DeltaTime, Ecb = ecb }.ScheduleParallel(state.Dependency);
       
       var changes = new ProcessActivityChanges { deltaTime = SystemAPI.Time.DeltaTime }.ScheduleParallel(timerUpdate);
+      
+      var move = new MoveToActivityJob { deltaTime = SystemAPI.Time.DeltaTime }.ScheduleParallel(changes);
 
-      var prod = new ProcessProducerActivity { Ecb = ecb }.ScheduleParallel(changes);
+      var prod = new ProcessProducerActivity { Ecb = ecb }.ScheduleParallel(move);
       var haul = new ProcessHaulerActivity { Ecb = ecb, haulableStuff = SystemAPI.GetComponentLookup<HaulableData>() }.ScheduleParallel(prod);
       var clean = new ProcessCleanerActivity { Ecb = ecb }.ScheduleParallel(haul);
 
-      var move = new MoveToActivityJob { deltaTime = SystemAPI.Time.DeltaTime }.ScheduleParallel(clean);
-      state.Dependency = move;
+      state.Dependency = clean;
    }
 
    [BurstCompile]
