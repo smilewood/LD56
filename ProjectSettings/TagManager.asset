@@ -6,6 +6,7 @@ TagManager:
   tags:
   - EconomyManager
   - AudioManager
+  - Menu
   layers:
   - Default
   - TransparentFX

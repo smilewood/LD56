@@ -35,6 +35,8 @@ public class MenuFunctions : MonoBehaviour
 
    public bool InGameMenuIsOpen = false;
 
+   public bool GameOver = false;
+
    private bool MainMenuOpen = true;
 
    private bool AnyMenuOpen = true;
@@ -73,6 +75,18 @@ public class MenuFunctions : MonoBehaviour
       {
          PlayIntroVoiceAndHideMenu();
       }
+   }
+
+   /// <summary>
+   /// Show the victory screen/end of game
+   /// </summary>
+   public static void ShowWinScreen()
+   {
+      MenuFunctions menuFunctions = GameObject.FindGameObjectWithTag("Menu").GetComponent<MenuFunctions>();
+      menuFunctions.ShowMenu("Win");
+      menuFunctions.AudioManager.PlayUISubmit();
+      menuFunctions.GameOver = true;
+      Time.timeScale = 0f;
    }
 
    public void PlayIntroVoiceAndHideMenu()
@@ -133,6 +147,7 @@ public class MenuFunctions : MonoBehaviour
    {
       if (!isquitting)
       {
+         Time.timeScale = 1f;
          isquitting = true;
          StartCoroutine(ExplodeGame());
       }
@@ -231,6 +246,11 @@ public class MenuFunctions : MonoBehaviour
 
    void Update()
    {
+      if (GameOver)
+      {
+         return;
+      }
+
       if (IsIntroPlaying)
       {
          if (_openMenuAction.triggered)
