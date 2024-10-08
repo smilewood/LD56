@@ -2314,21 +2314,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 744683997168135649, guid: 43a19d3808fc1094d926e9fa583e725e,
-        type: 3}
-      propertyPath: Balance.Ore
-      value: 10000
-      objectReference: {fileID: 0}
-    - target: {fileID: 744683997168135649, guid: 43a19d3808fc1094d926e9fa583e725e,
-        type: 3}
-      propertyPath: Balance.Bread
-      value: 1800
-      objectReference: {fileID: 0}
-    - target: {fileID: 744683997168135649, guid: 43a19d3808fc1094d926e9fa583e725e,
-        type: 3}
-      propertyPath: Balance.Biomass
-      value: 10000
-      objectReference: {fileID: 0}
     - target: {fileID: 2594544463968805470, guid: 43a19d3808fc1094d926e9fa583e725e,
         type: 3}
       propertyPath: m_LocalPosition.x

@@ -130,10 +130,10 @@ MonoBehaviour:
   baselines:
   - ModType: 0
     startValue: 5
-    naturalDecayRate: 0.1
+    naturalDecayRate: 0.06
   - ModType: 1
     startValue: 5
-    naturalDecayRate: 0.1
+    naturalDecayRate: 0.06
   - ModType: 2
     startValue: 5
     naturalDecayRate: -0.03

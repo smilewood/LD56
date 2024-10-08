@@ -45,9 +45,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Balance:
-    Biomass: 0
-    Ore: 0
-    Bread: 0
+    Biomass: 15000
+    Ore: 15000
+    Bread: 2500
   buildingMetadataList:
   - Biomass: 2000
     Ore: 500
@@ -85,3 +85,4 @@ MonoBehaviour:
     Prefab: {fileID: 6520872950962820648, guid: f08662d1ec3e1b34db6a470713c99335,
       type: 3}
     BuildingType: 5
+  DudePurchaseCount: 0
